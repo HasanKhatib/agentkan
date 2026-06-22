@@ -177,7 +177,7 @@
           "exit": "ci.yml passes on Node 18, 20, and 22.",
           "tasks": [
             { "id": "E1.10-T1", "title": "Add .github/workflows/ci.yml", "status": "done", "assignee": "ai", "labels": ["infra"], "planned": null },
-            { "id": "E1.10-T2", "title": "Verify CI green on first push", "status": "doing", "assignee": "me", "labels": ["verify"], "planned": null }
+            { "id": "E1.10-T2", "title": "Verify CI green on first push", "status": "done", "assignee": "me", "labels": ["verify"], "planned": null }
           ]
         },
         {
@@ -218,7 +218,7 @@
           "id": "E1.13",
           "title": "GitHub ship",
           "emoji": "🐙",
-          "status": "active",
+          "status": "done",
           "assignee": "me",
           "labels": ["ops"],
           "planned": null,
@@ -226,15 +226,15 @@
           "goal": "Source on GitHub with initial commit on main.",
           "exit": "HasanKhatib/agentkan main branch matches local repo.",
           "tasks": [
-            { "id": "E1.13-T1", "title": "Initial commit", "status": "doing", "assignee": "ai", "labels": ["ops"], "planned": null },
-            { "id": "E1.13-T2", "title": "git push -u origin main", "status": "todo", "assignee": "me", "labels": ["ops"], "planned": null }
+            { "id": "E1.13-T1", "title": "Initial commit", "status": "done", "assignee": "ai", "labels": ["ops"], "planned": null },
+            { "id": "E1.13-T2", "title": "git push -u origin main", "status": "done", "assignee": "me", "labels": ["ops"], "planned": null }
           ]
         },
         {
           "id": "E1.14",
           "title": "npm metadata patch v0.1.1",
           "emoji": "🔖",
-          "status": "next",
+          "status": "active",
           "assignee": "me",
           "labels": ["ops"],
           "planned": null,
@@ -242,8 +242,8 @@
           "goal": "Republish with correct repository URL and metadata.",
           "exit": "npm view agentkan shows HasanKhatib/agentkan repository link.",
           "tasks": [
-            { "id": "E1.14-T1", "title": "Bump version to 0.1.1", "status": "todo", "assignee": "me", "labels": ["ops"], "planned": null },
-            { "id": "E1.14-T2", "title": "npm publish --access public", "status": "todo", "assignee": "me", "labels": ["ops"], "planned": null },
+            { "id": "E1.14-T1", "title": "Bump version to 0.1.1", "status": "done", "assignee": "me", "labels": ["ops"], "planned": null },
+            { "id": "E1.14-T2", "title": "npm publish --access public", "status": "doing", "assignee": "me", "labels": ["ops"], "planned": null },
             { "id": "E1.14-T3", "title": "Verify npm view repository URL", "status": "todo", "assignee": "me", "labels": ["verify"], "planned": null }
           ]
         }

@@ -1,7 +1,7 @@
 {
   "updated": "2026-06-22",
-  "next": "E1.13-T1",
-  "note": "Initial commit and push to HasanKhatib/agentkan on main",
+  "next": "E1.14-T2",
+  "note": "npm publish v0.1.1 (requires 2FA OTP) then verify repository URL on npm",
   "criticalPath": [
     {
       "title": "Revoke burned npm token (if not done)",
