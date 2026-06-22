@@ -1,0 +1,42 @@
+{
+  "_note": "Theme + emoji vocabulary for the board viewer. Map `theme` to your project's design tokens so the board feels native. Everything below is data the viewer reads; no code change needed to re-skin.",
+  "name": "default",
+  "theme": {
+    "bg-canvas": "#F7F8FA",
+    "bg-surface": "#FFFFFF",
+    "bg-sunken": "#EEF1F5",
+    "brand": "#3B82F6",
+    "brand-hover": "#2563EB",
+    "brand-subtle": "#EAF2FE",
+    "accent": "#F59E0B",
+    "text-primary": "#1F2937",
+    "text-secondary": "#6B7280",
+    "border": "#E5E7EB",
+    "warning": "#D97706",
+    "danger": "#DC2626",
+    "success": "#16A34A"
+  },
+  "assignees": {
+    "ai":        { "emoji": "🤖",   "label": "AI" },
+    "me":        { "emoji": "🧑",   "label": "Me" },
+    "ai+verify": { "emoji": "🤖✅", "label": "AI + verify" }
+  },
+  "statuses": {
+    "backlog": { "emoji": "📥",  "label": "Backlog" },
+    "next":    { "emoji": "⏭️", "label": "Next" },
+    "active":  { "emoji": "🔨",  "label": "Active" },
+    "blocked": { "emoji": "🔴",  "label": "Blocked" },
+    "done":    { "emoji": "✅",  "label": "Done" }
+  },
+  "labels": {
+    "design":   "🎨",
+    "frontend": "💻",
+    "backend":  "⚙️",
+    "db":       "🗄️",
+    "api":      "🔌",
+    "infra":    "🏗️",
+    "verify":   "🧪",
+    "docs":     "📄",
+    "ops":      "🛠️"
+  }
+}

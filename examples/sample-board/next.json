@@ -1,0 +1,15 @@
+{
+  "updated": "2026-06-22",
+  "next": "E1.1-T2",
+  "note": "Finish sign-up + login handlers, then wire session middleware (T3).",
+  "criticalPath": [
+    { "title": "Register production domain", "assignee": "me", "status": "todo", "unblocks": "E1.3" }
+  ],
+  "revenueBlockers": [
+    "Production deploy live (E1.3)",
+    "Billing not started yet"
+  ],
+  "fragile": [
+    "Session refresh not covered by tests yet."
+  ]
+}

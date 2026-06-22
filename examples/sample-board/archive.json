@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "updated": "2026-06-22",
+  "epics": [
+    {
+      "id": "E0.1", "title": "Project scaffold", "emoji": "🏗️",
+      "status": "done", "assignee": "ai", "labels": ["infra"],
+      "planned": null, "shipped": "2026-06-10", "phase": "P0", "order": 1,
+      "goal": "A running dev environment with one command.",
+      "exit": "`make dev` brings up the app and a health check is green.",
+      "tasks": [
+        { "id": "E0.1-T1", "title": "Repo + tooling", "status": "done", "assignee": "ai" },
+        { "id": "E0.1-T2", "title": "Health endpoint", "status": "done", "assignee": "ai" }
+      ]
+    }
+  ]
+}

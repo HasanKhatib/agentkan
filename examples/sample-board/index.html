@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>agentkan board</title>
+<style>
+  :root {
+    /* Defaults; overridden at runtime from board.tokens.json -> theme */
+    --bg-canvas: #F7F8FA;
+    --bg-surface: #FFFFFF;
+    --bg-sunken: #EEF1F5;
+    --brand: #3B82F6;
+    --brand-hover: #2563EB;
+    --brand-subtle: #EAF2FE;
+    --accent: #F59E0B;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --border: #E5E7EB;
+    --warning: #D97706;
+    --danger: #DC2626;
+    --success: #16A34A;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 12px rgba(16,24,40,.06);
+    --shadow-lg: 0 12px 32px rgba(16,24,40,.16);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--text-primary);
+    background: var(--bg-canvas);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  a { color: var(--brand); }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .h-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .title { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .updated { color: var(--text-secondary); font-size: 12px; }
+  .spacer { flex: 1; }
+  .pill {
+    border: 1px solid var(--border); background: var(--bg-surface);
+    border-radius: 999px; padding: 5px 11px; font-size: 12.5px; color: var(--text-primary);
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .pill.on { background: var(--brand-subtle); border-color: var(--brand); color: var(--brand-hover); font-weight: 600; }
+  .pill.ghost { color: var(--text-secondary); }
+  .btn {
+    border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary);
+    border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500;
+  }
+  .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .btn.primary:hover { background: var(--brand-hover); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .save-state { font-size: 12px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-secondary); }
+  .dot.ok { background: var(--success); }
+  .dot.dirty { background: var(--warning); }
+  .dot.ro { background: var(--text-secondary); }
+  input.search {
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+    min-width: 160px; background: var(--bg-canvas);
+  }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .filters .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); margin-right: 2px; }
+
+  /* ---------- Next banner ---------- */
+  .next { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 10px 20px; }
+  .next-head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .next-head .k { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); }
+  .next-body { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .next-card { background: var(--bg-canvas); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .next-card h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
+  .next-card ul { margin: 0; padding-left: 16px; }
+  .next-card li { margin: 3px 0; }
+
+  /* ---------- Board ---------- */
+  .board { display: flex; gap: 14px; padding: 16px 20px 40px; overflow-x: auto; align-items: flex-start; min-height: 60vh; }
+  .col { background: var(--bg-sunken); border-radius: var(--radius); min-width: 270px; width: 270px; flex: 0 0 auto; display: flex; flex-direction: column; max-height: calc(100vh - 150px); }
+  .col-head { padding: 11px 13px; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; }
+  .col-head .nm { font-weight: 650; font-size: 13px; }
+  .col-head .ct { margin-left: auto; background: var(--bg-surface); border-radius: 999px; padding: 1px 8px; font-size: 12px; color: var(--text-secondary); }
+  .col.drop { outline: 2px dashed var(--brand); outline-offset: -4px; }
+  .col-list { padding: 0 9px 9px; overflow-y: auto; display: flex; flex-direction: column; gap: 9px; }
+
+  .card {
+    background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 11px; box-shadow: var(--shadow); cursor: grab; position: relative;
+    transition: box-shadow .12s, transform .12s;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); }
+  .card.dragging { opacity: .5; }
+  .card.arch { background: repeating-linear-gradient(45deg, var(--bg-surface), var(--bg-surface) 9px, var(--bg-canvas) 9px, var(--bg-canvas) 18px); }
+  .card .ctop { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  .card .eid { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .card .emoji { font-size: 15px; }
+  .card .ctitle { font-size: 13.5px; font-weight: 550; line-height: 1.3; margin: 2px 0 8px; }
+  .card .chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .chip { font-size: 11px; border-radius: 6px; padding: 1px 7px; border: 1px solid var(--border); background: var(--bg-canvas); color: var(--text-secondary); display: inline-flex; gap: 3px; align-items: center; }
+  .chip.assignee { background: var(--brand-subtle); border-color: transparent; color: var(--brand-hover); font-weight: 600; }
+  .chip.date { }
+  .chip.date.overdue { background: #FEECEC; border-color: transparent; color: var(--danger); font-weight: 600; }
+  .chip.date.soon { background: #FEF6E7; border-color: transparent; color: var(--warning); font-weight: 600; }
+  .progress { margin-top: 8px; height: 5px; background: var(--bg-sunken); border-radius: 3px; overflow: hidden; }
+  .progress > i { display: block; height: 100%; background: var(--brand); }
+  .card .ptext { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+  .card.blocked-edge { border-left: 3px solid var(--danger); }
+
+  /* ---------- Drawer ---------- */
+  .scrim { position: fixed; inset: 0; background: rgba(16,24,40,.32); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: 440px; max-width: 92vw;
+    background: var(--bg-surface); z-index: 50; box-shadow: var(--shadow-lg);
+    transform: translateX(100%); transition: transform .18s ease; overflow-y: auto;
+  }
+  .drawer.open { transform: none; }
+  .dr-head { padding: 16px 18px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-surface); }
+  .dr-head .x { position: absolute; right: 14px; top: 14px; border: none; background: none; font-size: 20px; color: var(--text-secondary); }
+  .dr-head .eid { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+  .dr-head h2 { margin: 4px 0 0; font-size: 17px; line-height: 1.25; }
+  .dr-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+  .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); margin-bottom: 4px; }
+  .field input, .field select, .field textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; font-size: 13px; font-family: inherit; background: var(--bg-canvas); color: var(--text-primary);
+  }
+  .field textarea { resize: vertical; min-height: 48px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ge { background: var(--bg-canvas); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; }
+  .ge .k { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
+  .ge .v { margin-top: 3px; font-size: 13px; }
+  .tasks { display: flex; flex-direction: column; gap: 6px; }
+  .task { display: flex; align-items: flex-start; gap: 8px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-canvas); }
+  .task .tk { font-size: 11px; color: var(--text-secondary); font-weight: 600; min-width: 48px; }
+  .task .tt { flex: 1; font-size: 13px; }
+  .task.done .tt { text-decoration: line-through; color: var(--text-secondary); }
+  .task .st { border: none; background: none; font-size: 15px; cursor: pointer; }
+  .dr-actions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
+  .danger { color: var(--danger); border-color: #f3c0c0; }
+  .muted { color: var(--text-secondary); font-size: 12.5px; }
+  .hidden { display: none !important; }
+
+  /* ---------- Empty / connect screen ---------- */
+  .welcome { max-width: 560px; margin: 8vh auto; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 30px; box-shadow: var(--shadow); }
+  .welcome h1 { margin: 0 0 4px; font-size: 20px; }
+  .welcome p { color: var(--text-secondary); }
+  .welcome code { background: var(--bg-sunken); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; padding: 10px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); }
+  .legend b { color: var(--text-primary); font-weight: 600; }
+  @media (max-width: 640px) { .col, .col { min-width: 84vw; width: 84vw; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   agentkan board — single-file, dependency-free.
+   Read-only by default (works behind `agentkan serve`); click
+   "Enable editing" to connect the folder read-write via the
+   File System Access API.
+   ============================================================ */
+
+const STATUS_ORDER = ["backlog", "next", "active", "blocked", "done"];
+const TASK_CYCLE = { todo: "doing", doing: "done", done: "todo" };
+
+const state = {
+  tokens: null, roadmap: null, archive: null, next: null,
+  dirHandle: null,         // FileSystemDirectoryHandle when editing enabled
+  canWrite: false,
+  dirty: false, saving: false,
+  showArchived: false,
+  filter: { assignee: new Set(), label: new Set(), q: "" },
+  openEpicId: null,
+  legendOpen: false,
+};
+
+/* ---------- tiny IndexedDB for the directory handle ---------- */
+const idb = {
+  db: null,
+  open() {
+    return new Promise((res) => {
+      const r = indexedDB.open("agentkan", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("kv");
+      r.onsuccess = () => { this.db = r.result; res(); };
+      r.onerror = () => res();
+    });
+  },
+  get(k) { return new Promise((res) => { if (!this.db) return res(null); const t = this.db.transaction("kv").objectStore("kv").get(k); t.onsuccess = () => res(t.result || null); t.onerror = () => res(null); }); },
+  set(k, v) { return new Promise((res) => { if (!this.db) return res(); const t = this.db.transaction("kv", "readwrite").objectStore("kv").put(v, k); t.onsuccess = () => res(); t.onerror = () => res(); }); },
+};
+
+/* ---------- helpers ---------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const el = (tag, props = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined) n.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null) n.append(c.nodeType ? c : document.createTextNode(c));
+  return n;
+};
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function assigneeMeta(a) { return state.tokens?.assignees?.[a] || { emoji: "", label: a || "" }; }
+function statusMeta(s) { return state.tokens?.statuses?.[s] || { emoji: "", label: s }; }
+function labelEmoji(l) { return state.tokens?.labels?.[l] || ""; }
+
+function relDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso + "T00:00:00");
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const days = Math.round((d - now) / 86400000);
+  let txt, cls = "";
+  if (days < 0) { txt = `${-days}d overdue`; cls = "overdue"; }
+  else if (days === 0) { txt = "today"; cls = "soon"; }
+  else if (days <= 7) { txt = `in ${days}d`; cls = "soon"; }
+  else txt = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return { txt, cls };
+}
+
+/* ---------- data access ---------- */
+function allEpics() {
+  const out = [];
+  for (const p of state.roadmap?.phases || [])
+    for (const e of p.epics || []) out.push({ epic: e, phase: p, archived: false });
+  if (state.showArchived)
+    for (const e of state.archive?.epics || []) out.push({ epic: e, phase: { id: e.phase, title: e.phase || "Archive" }, archived: true });
+  return out;
+}
+function findEpic(id) { return allEpics().find((x) => x.epic.id === id) || null; }
+
+function passesFilter(e) {
+  const f = state.filter;
+  if (f.assignee.size && !f.assignee.has(e.assignee)) return false;
+  if (f.label.size && !(e.labels || []).some((l) => f.label.has(l))) return false;
+  if (f.q) {
+    const hay = (e.id + " " + e.title + " " + (e.labels || []).join(" ")).toLowerCase();
+    if (!hay.includes(f.q.toLowerCase())) return false;
+  }
+  return true;
+}
+
+/* ---------- load ---------- */
+async function readJSON(path) {
+  const r = await fetch(path, { cache: "no-store" });
+  if (!r.ok) throw new Error(path + " " + r.status);
+  return r.json();
+}
+async function loadReadOnly() {
+  state.tokens = await readJSON("./board.tokens.json").catch(() => null);
+  state.roadmap = await readJSON("./roadmap.json");
+  state.archive = await readJSON("./archive.json").catch(() => ({ version: 1, epics: [] }));
+  state.next = await readJSON("./next.json").catch(() => null);
+}
+async function readFromDir(name, fallback) {
+  try { const fh = await state.dirHandle.getFileHandle(name); const f = await fh.getFile(); return JSON.parse(await f.text()); }
+  catch { return fallback; }
+}
+async function loadFromDir() {
+  state.tokens = await readFromDir("board.tokens.json", state.tokens);
+  state.roadmap = await readFromDir("roadmap.json", state.roadmap);
+  state.archive = await readFromDir("archive.json", { version: 1, epics: [] });
+  state.next = await readFromDir("next.json", state.next);
+}
+
+/* ---------- save ---------- */
+async function writeJSON(name, obj) {
+  const fh = await state.dirHandle.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();
+  await w.write(JSON.stringify(obj, null, 2) + "\n");
+  await w.close();
+}
+let saveTimer = null;
+function scheduleSave() {
+  if (!state.canWrite) { state.dirty = true; renderSaveState(); return; }
+  state.dirty = true; renderSaveState();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(doSave, 400);
+}
+async function doSave() {
+  if (!state.canWrite || state.saving) return;
+  state.saving = true; renderSaveState();
+  try {
+    state.roadmap.updated = new Date().toISOString().slice(0, 10);
+    await writeJSON("roadmap.json", state.roadmap);
+    await writeJSON("archive.json", state.archive);
+    state.dirty = false;
+  } catch (e) { alert("Save failed: " + e.message); }
+  state.saving = false; renderSaveState();
+}
+
+/* ---------- mutations ---------- */
+function moveEpic(id, newStatus) {
+  const x = findEpic(id);
+  if (!x || x.archived) return;
+  x.epic.status = newStatus;
+  scheduleSave(); render();
+}
+function cycleTask(epicId, taskId) {
+  const x = findEpic(epicId); if (!x) return;
+  const t = (x.epic.tasks || []).find((t) => t.id === taskId); if (!t) return;
+  t.status = TASK_CYCLE[t.status] || "todo";
+  scheduleSave(); renderDrawer(); renderBoard();
+}
+function editEpic(id, patch) {
+  const x = findEpic(id); if (!x) return;
+  Object.assign(x.epic, patch);
+  scheduleSave(); renderBoard(); renderDrawer();
+}
+function archiveEpic(id) {
+  const idx = state.roadmap.phases.findIndex((p) => (p.epics || []).some((e) => e.id === id));
+  if (idx < 0) return;
+  const p = state.roadmap.phases[idx];
+  const i = p.epics.findIndex((e) => e.id === id);
+  const [epic] = p.epics.splice(i, 1);
+  epic.status = "done";
+  epic.phase = epic.phase || p.id;
+  epic.shipped = epic.shipped || new Date().toISOString().slice(0, 10);
+  state.archive.epics = state.archive.epics || [];
+  state.archive.epics.unshift(epic);
+  state.openEpicId = null;
+  scheduleSave(); render();
+}
+function restoreEpic(id) {
+  const i = (state.archive.epics || []).findIndex((e) => e.id === id);
+  if (i < 0) return;
+  const [epic] = state.archive.epics.splice(i, 1);
+  const target = state.roadmap.phases.find((p) => p.id === epic.phase) ||
+    state.roadmap.phases.find((p) => p.status === "active") || state.roadmap.phases[0];
+  epic.status = "active"; delete epic.shipped;
+  target.epics.push(epic);
+  scheduleSave(); render();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function applyTheme() {
+  const t = state.tokens?.theme || {};
+  const map = { "bg-canvas": "--bg-canvas", "bg-surface": "--bg-surface", "bg-sunken": "--bg-sunken", "brand": "--brand", "brand-hover": "--brand-hover", "brand-subtle": "--brand-subtle", "accent": "--accent", "text-primary": "--text-primary", "text-secondary": "--text-secondary", "border": "--border", "warning": "--warning", "danger": "--danger", "success": "--success" };
+  for (const [k, v] of Object.entries(map)) if (t[k]) document.documentElement.style.setProperty(v, t[k]);
+}
+
+function render() { applyTheme(); renderApp(); }
+
+function renderApp() {
+  const app = $("#app");
+  app.innerHTML = "";
+  app.append(renderHeader());
+  if (state.legendOpen) app.append(renderLegend());
+  if (state.next) app.append(renderNext());
+  app.append(renderBoardEl());
+  app.append(renderDrawerEl());
+  renderSaveState();
+}
+
+function chip(text, cls = "") { return el("span", { class: "chip " + cls }, text); }
+
+function renderHeader() {
+  const f = state.filter;
+  const assignees = state.tokens?.assignees || {};
+  const labels = state.tokens?.labels || {};
+
+  const assigneeChips = Object.keys(assignees).map((a) =>
+    el("button", { class: "pill" + (f.assignee.has(a) ? " on" : ""), title: "Filter: " + assignees[a].label,
+      onclick: () => { f.assignee.has(a) ? f.assignee.delete(a) : f.assignee.add(a); render(); } },
+      assignees[a].emoji + " " + assignees[a].label));
+
+  const labelChips = Object.keys(labels).map((l) =>
+    el("button", { class: "pill ghost" + (f.label.has(l) ? " on" : ""),
+      onclick: () => { f.label.has(l) ? f.label.delete(l) : f.label.add(l); render(); } },
+      labels[l] + " " + l));
+
+  const editBtn = state.canWrite
+    ? el("span", { class: "save-state", id: "save-state" })
+    : el("button", { class: "btn primary", onclick: enableEditing }, "Enable editing");
+
+  return el("header", {},
+    el("div", { class: "h-row" },
+      el("span", { class: "title" }, (state.roadmap?.project || "Board")),
+      el("span", { class: "updated" }, state.roadmap?.updated ? "updated " + state.roadmap.updated : ""),
+      el("span", { class: "spacer" }),
+      el("input", { class: "search", placeholder: "Search…", value: f.q,
+        oninput: (e) => { f.q = e.target.value; renderBoard(); } }),
+      el("button", { class: "pill" + (state.showArchived ? " on" : ""),
+        onclick: () => { state.showArchived = !state.showArchived; render(); } }, "🗄️ Archived"),
+      el("button", { class: "pill", onclick: () => { state.legendOpen = !state.legendOpen; render(); } }, "ℹ️ Legend"),
+      el("button", { class: "btn", onclick: reload }, "↻"),
+      editBtn,
+    ),
+    el("div", { class: "filters" },
+      el("span", { class: "lbl" }, "Who"), ...assigneeChips,
+      el("span", { class: "lbl", style: "margin-left:10px" }, "Labels"), ...labelChips,
+      (f.assignee.size || f.label.size || f.q)
+        ? el("button", { class: "pill ghost", onclick: () => { f.assignee.clear(); f.label.clear(); f.q = ""; render(); } }, "✕ clear")
+        : null,
+    ),
+  );
+}
+
+function renderLegend() {
+  const a = state.tokens?.assignees || {}, s = state.tokens?.statuses || {}, l = state.tokens?.labels || {};
+  const grp = (title, obj, fmt) => el("span", {}, el("b", {}, title + ": "),
+    Object.entries(obj).map(([k, v]) => fmt(k, v)).join("   "));
+  return el("div", { class: "legend" },
+    grp("Assignee", a, (k, v) => `${v.emoji} ${v.label}`),
+    grp("Status", s, (k, v) => `${v.emoji} ${v.label}`),
+    grp("Labels", l, (k, v) => `${v} ${k}`),
+  );
+}
+
+function renderNext() {
+  const n = state.next;
+  const head = el("div", { class: "next-head", onclick: () => { n._open = !n._open; render(); } },
+    el("span", { class: "k" }, "▶ Now"),
+    el("span", {}, n.next ? el("b", {}, n.next) : "—"),
+    n.note ? el("span", { class: "muted" }, "· " + n.note) : null,
+  );
+  const wrap = el("div", { class: "next" }, head);
+  if (n._open) {
+    const body = el("div", { class: "next-body" });
+    if (n.criticalPath?.length) body.append(el("div", { class: "next-card" },
+      el("h4", {}, "🧑 Critical path (human-only)"),
+      el("ul", {}, n.criticalPath.map((c) => el("li", {}, (typeof c === "string" ? c : c.title) + (c.unblocks ? ` → ${c.unblocks}` : ""))))));
+    if (n.revenueBlockers?.length) body.append(el("div", { class: "next-card" },
+      el("h4", {}, "💳 Revenue blockers"),
+      el("ul", {}, n.revenueBlockers.map((c) => el("li", {}, c)))));
+    if (n.fragile?.length) body.append(el("div", { class: "next-card" },
+      el("h4", {}, "⚠️ Fragile / watch"),
+      el("ul", {}, n.fragile.map((c) => el("li", {}, c)))));
+    wrap.append(body);
+  }
+  return wrap;
+}
+
+function renderBoardEl() {
+  const board = el("div", { class: "board", id: "board" });
+  STATUS_ORDER.forEach((st) => board.append(renderColumn(st)));
+  return board;
+}
+function renderColumn(st) {
+  const meta = statusMeta(st);
+  const items = allEpics().filter((x) => x.epic.status === st && passesFilter(x.epic));
+  const col = el("div", { class: "col", "data-status": st,
+    ondragover: (e) => { e.preventDefault(); col.classList.add("drop"); },
+    ondragleave: () => col.classList.remove("drop"),
+    ondrop: (e) => { e.preventDefault(); col.classList.remove("drop"); const id = e.dataTransfer.getData("text/id"); if (id) moveEpic(id, st); },
+  });
+  col.append(el("div", { class: "col-head" },
+    el("span", {}, meta.emoji), el("span", { class: "nm" }, meta.label),
+    el("span", { class: "ct" }, String(items.length))));
+  const list = el("div", { class: "col-list" });
+  items.sort((a, b) => (a.epic.order || 0) - (b.epic.order || 0));
+  items.forEach((x) => list.append(renderCard(x)));
+  col.append(list);
+  return col;
+}
+function renderCard(x) {
+  const e = x.epic;
+  const tasks = e.tasks || [];
+  const done = tasks.filter((t) => t.status === "done").length;
+  const am = assigneeMeta(e.assignee);
+  const rd = relDate(e.planned);
+  const card = el("div", {
+    class: "card" + (x.archived ? " arch" : "") + (e.status === "blocked" ? " blocked-edge" : ""),
+    draggable: x.archived ? "false" : "true",
+    ondragstart: (ev) => { ev.dataTransfer.setData("text/id", e.id); card.classList.add("dragging"); },
+    ondragend: () => card.classList.remove("dragging"),
+    onclick: () => openDrawer(e.id),
+  },
+    el("div", { class: "ctop" },
+      el("span", { class: "emoji" }, e.emoji || "🧩"),
+      el("span", { class: "eid" }, e.id),
+      x.archived ? chip("archived") : null,
+    ),
+    el("div", { class: "ctitle" }, e.title),
+    el("div", { class: "chips" },
+      chip(am.emoji + " " + am.label, "assignee"),
+      ...(e.labels || []).map((l) => chip((labelEmoji(l) ? labelEmoji(l) + " " : "") + l)),
+      rd ? chip("📅 " + rd.txt, "date " + rd.cls) : null,
+    ),
+  );
+  if (tasks.length) {
+    card.append(el("div", { class: "progress" }, el("i", { style: `width:${Math.round(done / tasks.length * 100)}%` })));
+    card.append(el("div", { class: "ptext" }, `${done}/${tasks.length} tasks`));
+  }
+  return card;
+}
+
+/* ---------- drawer ---------- */
+function renderDrawerEl() {
+  const scrim = el("div", { class: "scrim" + (state.openEpicId ? " open" : ""), onclick: closeDrawer });
+  const drawer = el("div", { class: "drawer" + (state.openEpicId ? " open" : ""), id: "drawer" });
+  if (state.openEpicId) drawer.append(...drawerContent(findEpic(state.openEpicId)));
+  return el("div", {}, scrim, drawer);
+}
+function openDrawer(id) { state.openEpicId = id; render(); }
+function closeDrawer() { state.openEpicId = null; render(); }
+function renderDrawer() { const x = findEpic(state.openEpicId); const d = $("#drawer"); if (d && x) { d.innerHTML = ""; d.append(...drawerContent(x)); } }
+
+function drawerContent(x) {
+  if (!x) return [];
+  const e = x.epic;
+  const ro = !state.canWrite || x.archived;
+  const am = assigneeMeta(e.assignee);
+
+  const head = el("div", { class: "dr-head" },
+    el("button", { class: "x", onclick: closeDrawer }, "×"),
+    el("div", { class: "eid" }, e.emoji + " " + e.id + (x.archived ? " · archived" : "")),
+    el("h2", {}, e.title),
+  );
+
+  const body = el("div", { class: "dr-body" });
+
+  // editable meta
+  const assigneeSel = el("select", { disabled: ro, onchange: (ev) => editEpic(e.id, { assignee: ev.target.value }) },
+    ...Object.keys(state.tokens?.assignees || { ai: 1, me: 1, "ai+verify": 1 }).map((a) =>
+      el("option", { value: a, selected: a === e.assignee ? "" : null }, assigneeMeta(a).emoji + " " + assigneeMeta(a).label)));
+  const statusSel = el("select", { disabled: ro, onchange: (ev) => editEpic(e.id, { status: ev.target.value }) },
+    ...STATUS_ORDER.map((s) => el("option", { value: s, selected: s === e.status ? "" : null }, statusMeta(s).emoji + " " + statusMeta(s).label)));
+  const plannedInp = el("input", { type: "date", value: e.planned || "", disabled: ro,
+    onchange: (ev) => editEpic(e.id, { planned: ev.target.value || null }) });
+  const labelsInp = el("input", { type: "text", value: (e.labels || []).join(", "), disabled: ro, placeholder: "comma,separated",
+    onchange: (ev) => editEpic(e.id, { labels: ev.target.value.split(",").map((s) => s.trim()).filter(Boolean) }) });
+
+  body.append(
+    el("div", { class: "row2" },
+      el("div", { class: "field" }, el("label", {}, "Assignee"), assigneeSel),
+      el("div", { class: "field" }, el("label", {}, "Status"), statusSel)),
+    el("div", { class: "row2" },
+      el("div", { class: "field" }, el("label", {}, "Planned"), plannedInp),
+      el("div", { class: "field" }, el("label", {}, "Labels"), labelsInp)),
+    el("div", { class: "ge" }, el("div", { class: "k" }, "🎯 Goal"), el("div", { class: "v" }, e.goal || "—")),
+    el("div", { class: "ge" }, el("div", { class: "k" }, "✅ Exit"), el("div", { class: "v" }, e.exit || "—")),
+  );
+
+  if (e.body) body.append(el("div", { class: "muted" }, "📄 Body: ", el("code", {}, e.body),
+    "  ", el("span", { class: "muted" }, "(open in your editor)")));
+
+  // tasks
+  if ((e.tasks || []).length) {
+    const list = el("div", { class: "tasks" });
+    e.tasks.forEach((t) => {
+      const tm = statusMeta(t.status === "done" ? "done" : t.status === "doing" ? "active" : "backlog");
+      list.append(el("div", { class: "task" + (t.status === "done" ? " done" : "") },
+        el("button", { class: "st", title: "cycle status", disabled: ro, onclick: () => cycleTask(e.id, t.id) },
+          t.status === "done" ? "☑️" : t.status === "doing" ? "🔨" : "⬜"),
+        el("span", { class: "tk" }, t.id.split("-").pop()),
+        el("span", { class: "tt" }, t.title),
+        t.assignee ? el("span", { class: "muted" }, assigneeMeta(t.assignee).emoji) : null,
+      ));
+    });
+    body.append(el("div", { class: "field" }, el("label", {}, "Tasks"), list));
+  }
+
+  // actions
+  const actions = el("div", { class: "dr-actions" });
+  if (!x.archived && state.canWrite) actions.append(el("button", { class: "btn danger", onclick: () => { if (confirm("Archive " + e.id + "?")) archiveEpic(e.id); } }, "🗄️ Archive"));
+  if (x.archived && state.canWrite) actions.append(el("button", { class: "btn", onclick: () => restoreEpic(e.id) }, "↩︎ Restore to board"));
+  if (ro && !x.archived) actions.append(el("span", { class: "muted" }, "Read-only — click ‘Enable editing’ to change."));
+  body.append(actions);
+
+  return [head, body];
+}
+
+/* ---------- save-state chip ---------- */
+function renderSaveState() {
+  const node = $("#save-state");
+  if (!node) return;
+  let dot = "ro", txt = "read-only";
+  if (state.canWrite) {
+    if (state.saving) { dot = "dirty"; txt = "saving…"; }
+    else if (state.dirty) { dot = "dirty"; txt = "unsaved"; }
+    else { dot = "ok"; txt = "saved"; }
+  }
+  node.innerHTML = "";
+  node.append(el("span", { class: "dot " + dot }), txt);
+}
+
+/* ---------- connect / reload ---------- */
+async function enableEditing() {
+  if (!window.showDirectoryPicker) {
+    alert("This browser can't edit files directly. Use Chrome or Edge, or edit the JSON in your editor.");
+    return;
+  }
+  try {
+    let handle = await idb.get("dir");
+    if (handle) {
+      const perm = await handle.queryPermission({ mode: "readwrite" });
+      if (perm !== "granted") {
+        const req = await handle.requestPermission({ mode: "readwrite" });
+        if (req !== "granted") handle = null;
+      }
+    }
+    if (!handle) {
+      handle = await window.showDirectoryPicker({ mode: "readwrite" });
+      await idb.set("dir", handle);
+    }
+    state.dirHandle = handle; state.canWrite = true;
+    await loadFromDir();
+    render();
+  } catch (e) { if (e.name !== "AbortError") alert("Couldn't connect folder: " + e.message); }
+}
+async function reload() {
+  if (state.canWrite) await loadFromDir(); else await loadReadOnly();
+  render();
+}
+
+/* ---------- boot ---------- */
+async function boot() {
+  await idb.open();
+  try {
+    await loadReadOnly();
+  } catch (e) {
+    $("#app").innerHTML = "";
+    $("#app").append(el("div", { class: "welcome" },
+      el("h1", {}, "agentkan board"),
+      el("p", {}, "Couldn't load the board files. Serve this folder with:"),
+      el("p", {}, el("code", {}, "npx agentkan serve")),
+      el("p", { class: "muted" }, "Or open the folder directly:"),
+      el("p", {}, el("button", { class: "btn primary", onclick: enableEditing }, "Open board folder")),
+    ));
+    return;
+  }
+  // try to silently restore a previously granted folder for write
+  if (window.showDirectoryPicker) {
+    const handle = await idb.get("dir");
+    if (handle && (await handle.queryPermission({ mode: "readwrite" })) === "granted") {
+      state.dirHandle = handle; state.canWrite = true; await loadFromDir();
+    }
+  }
+  if (state.next && state.next._open === undefined) state.next._open = true;
+  render();
+}
+boot();
+</script>
+</body>
+</html>

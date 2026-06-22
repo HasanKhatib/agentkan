@@ -1,0 +1,36 @@
+{
+  "name": "agentkan",
+  "version": "0.1.0",
+  "description": "Local-first epic/task roadmap board for working with AI agents: hybrid JSON state, markdown bodies, a single-file read-write viewer. No server, no build, no lock-in.",
+  "type": "module",
+  "bin": {
+    "agentkan": "bin/cli.mjs",
+    "ak": "bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "assets",
+    "templates",
+    "skill",
+    "README.md"
+  ],
+  "scripts": {
+    "validate": "node bin/cli.mjs validate examples/sample-board && node bin/cli.mjs validate docs/board",
+    "test": "node test/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["roadmap", "kanban", "epics", "tasks", "local-first", "ai-agents", "markdown", "json", "board"],
+  "license": "MIT",
+  "author": "Hasan Khatib",
+  "homepage": "https://github.com/HasanKhatib/agentkan#readme",
+  "bugs": {
+    "url": "https://github.com/HasanKhatib/agentkan/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HasanKhatib/agentkan.git"
+  }
+}

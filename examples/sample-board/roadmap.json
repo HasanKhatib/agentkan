@@ -1,0 +1,78 @@
+{
+  "$schema": "./roadmap.schema.json",
+  "version": 1,
+  "project": "Sample App",
+  "updated": "2026-06-22",
+  "phases": [
+    {
+      "id": "P1",
+      "title": "MVP",
+      "emoji": "🔨",
+      "status": "active",
+      "goal": "A usable first version a real user can sign up for and use daily.",
+      "exit": "A new user signs up, completes onboarding, and performs the core action without help.",
+      "epics": [
+        {
+          "id": "E1.1", "title": "Auth and sign-up", "emoji": "🔐",
+          "status": "active", "assignee": "ai", "labels": ["backend", "api"],
+          "planned": "2026-06-25", "order": 1,
+          "goal": "Email + password sign-up with sessions in httpOnly cookies.",
+          "exit": "A new email registers, logs in, and stays logged in across a refresh.",
+          "body": "epics/E1.1.md",
+          "tasks": [
+            { "id": "E1.1-T1", "title": "Users table + migration", "status": "done", "assignee": "ai", "labels": ["db"] },
+            { "id": "E1.1-T2", "title": "Sign-up + login handlers", "status": "doing", "assignee": "ai", "labels": ["api"] },
+            { "id": "E1.1-T3", "title": "Session middleware", "status": "todo", "assignee": "ai", "labels": ["backend"] }
+          ]
+        },
+        {
+          "id": "E1.2", "title": "Onboarding wizard", "emoji": "🧭",
+          "status": "next", "assignee": "ai+verify", "labels": ["frontend", "design"],
+          "planned": null, "order": 2,
+          "goal": "A 3-step wizard that gets a new user to their first value.",
+          "exit": "A first-time user finishes the wizard and lands on a populated home screen.",
+          "tasks": [
+            { "id": "E1.2-T1", "title": "Wizard layout + steps", "status": "todo", "assignee": "ai", "labels": ["frontend"] },
+            { "id": "E1.2-T2", "title": "Persist progress", "status": "todo", "assignee": "ai", "labels": ["api"] }
+          ]
+        },
+        {
+          "id": "E1.3", "title": "Domain + production deploy", "emoji": "🚀",
+          "status": "blocked", "assignee": "me", "labels": ["ops", "infra"],
+          "planned": null, "order": 3,
+          "goal": "Buy the domain and stand up a production environment.",
+          "exit": "The app is reachable over HTTPS on the production domain.",
+          "tasks": [
+            { "id": "E1.3-T1", "title": "Register domain", "status": "todo", "assignee": "me" }
+          ]
+        },
+        {
+          "id": "E1.4", "title": "Analytics baseline", "emoji": "📈",
+          "status": "backlog", "assignee": "ai", "labels": ["backend"],
+          "planned": null, "order": 4,
+          "goal": "Capture sign-ups and core-action events.",
+          "exit": "A dashboard query returns daily sign-up counts.",
+          "tasks": []
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Growth",
+      "emoji": "🌱",
+      "status": "planned",
+      "goal": "Features that bring users back.",
+      "exit": "Weekly retention is measurable and trending up.",
+      "epics": [
+        {
+          "id": "E2.1", "title": "Email digests", "emoji": "✉️",
+          "status": "backlog", "assignee": "ai", "labels": ["backend"],
+          "planned": null, "order": 1,
+          "goal": "A weekly digest email of what the user missed.",
+          "exit": "A test user receives a correct digest on schedule.",
+          "tasks": []
+        }
+      ]
+    }
+  ]
+}

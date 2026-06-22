@@ -1,0 +1,15 @@
+{
+  "updated": "2026-06-22",
+  "next": "E1.13-T1",
+  "note": "Initial commit and push to HasanKhatib/agentkan on main",
+  "criticalPath": [
+    {
+      "title": "Revoke burned npm token (if not done)",
+      "assignee": "me",
+      "status": "todo",
+      "unblocks": "E1.14"
+    }
+  ],
+  "revenueBlockers": [],
+  "fragile": []
+}

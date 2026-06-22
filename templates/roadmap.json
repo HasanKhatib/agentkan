@@ -1,0 +1,33 @@
+{
+  "$schema": "./roadmap.schema.json",
+  "version": 1,
+  "project": "PROJECT_NAME",
+  "updated": "DATE",
+  "phases": [
+    {
+      "id": "P1",
+      "title": "Phase 1",
+      "emoji": "🔨",
+      "status": "active",
+      "goal": "What this phase achieves.",
+      "exit": "Observable check that proves the phase is done.",
+      "epics": [
+        {
+          "id": "E1.1",
+          "title": "First epic",
+          "emoji": "🧩",
+          "status": "next",
+          "assignee": "ai",
+          "labels": ["docs"],
+          "planned": null,
+          "order": 1,
+          "goal": "One line: what done looks like for this epic.",
+          "exit": "One AI-verifiable line phrased as observable behavior.",
+          "tasks": [
+            { "id": "E1.1-T1", "title": "First task", "status": "todo", "assignee": "ai", "labels": [], "planned": null }
+          ]
+        }
+      ]
+    }
+  ]
+}

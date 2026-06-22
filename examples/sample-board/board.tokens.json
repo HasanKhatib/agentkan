@@ -1,0 +1,25 @@
+{
+  "name": "sample",
+  "theme": {
+    "bg-canvas": "#F7F8FA", "bg-surface": "#FFFFFF", "bg-sunken": "#EEF1F5",
+    "brand": "#6D5AE6", "brand-hover": "#5847c9", "brand-subtle": "#EDEBFB",
+    "accent": "#F59E0B", "text-primary": "#1F2937", "text-secondary": "#6B7280",
+    "border": "#E5E7EB", "warning": "#D97706", "danger": "#DC2626", "success": "#16A34A"
+  },
+  "assignees": {
+    "ai":        { "emoji": "🤖",   "label": "AI" },
+    "me":        { "emoji": "🧑",   "label": "Me" },
+    "ai+verify": { "emoji": "🤖✅", "label": "AI + verify" }
+  },
+  "statuses": {
+    "backlog": { "emoji": "📥",  "label": "Backlog" },
+    "next":    { "emoji": "⏭️", "label": "Next" },
+    "active":  { "emoji": "🔨",  "label": "Active" },
+    "blocked": { "emoji": "🔴",  "label": "Blocked" },
+    "done":    { "emoji": "✅",  "label": "Done" }
+  },
+  "labels": {
+    "design": "🎨", "frontend": "💻", "backend": "⚙️", "db": "🗄️",
+    "api": "🔌", "infra": "🏗️", "verify": "🧪", "docs": "📄", "ops": "🛠️"
+  }
+}
