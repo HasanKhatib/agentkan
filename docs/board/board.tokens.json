@@ -1,20 +1,20 @@
 {
-  "_note": "Theme + emoji vocabulary for the board viewer. Map `theme` to your project's design tokens so the board feels native. Everything below is data the viewer reads; no code change needed to re-skin.",
+  "_note": "Theme + emoji vocabulary for the board viewer. Map `theme` to your project's design tokens so the board feels native. Labels are free-form; this list only assigns an emoji to the ones this board uses. Everything below is data the viewer reads; no code change needed to re-skin.",
   "name": "default",
   "theme": {
-    "bg-canvas": "#F7F8FA",
+    "bg-canvas": "#FFFFFF",
     "bg-surface": "#FFFFFF",
-    "bg-sunken": "#EEF1F5",
-    "brand": "#3B82F6",
-    "brand-hover": "#2563EB",
-    "brand-subtle": "#EAF2FE",
-    "accent": "#F59E0B",
-    "text-primary": "#1F2937",
+    "bg-sunken": "#F5F5F5",
+    "brand": "#111111",
+    "brand-hover": "#242424",
+    "brand-subtle": "#F3F4F6",
+    "accent": "#3B82F6",
+    "text-primary": "#111111",
     "text-secondary": "#6B7280",
     "border": "#E5E7EB",
-    "warning": "#D97706",
-    "danger": "#DC2626",
-    "success": "#16A34A"
+    "warning": "#F59E0B",
+    "danger": "#EF4444",
+    "success": "#10B981"
   },
   "assignees": {
     "ai":        { "emoji": "🤖",   "label": "AI" },
@@ -29,11 +29,8 @@
     "done":    { "emoji": "✅",  "label": "Done" }
   },
   "labels": {
-    "design":   "🎨",
     "frontend": "💻",
     "backend":  "⚙️",
-    "db":       "🗄️",
-    "api":      "🔌",
     "infra":    "🏗️",
     "verify":   "🧪",
     "docs":     "📄",

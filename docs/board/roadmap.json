@@ -2,7 +2,7 @@
   "$schema": "./roadmap.schema.json",
   "version": 1,
   "project": "agentkan",
-  "updated": "2026-06-22",
+  "updated": "2026-06-23",
   "phases": [
     {
       "id": "P1",
@@ -18,16 +18,45 @@
           "emoji": "🏷️",
           "status": "done",
           "assignee": "ai",
-          "labels": ["docs"],
+          "labels": [
+            "docs"
+          ],
           "planned": null,
           "order": 1,
           "goal": "Pick a memorable, npm-available name that fits the AI-shared-board model.",
           "exit": "Package name is registered on npm and used consistently in repo and CLI.",
           "body": "epics/E1.1.md",
           "tasks": [
-            { "id": "E1.1-T1", "title": "Verify npm availability for candidate names", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.1-T2", "title": "Evaluate discoverability vs brandability tradeoffs", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.1-T3", "title": "Lock name: agentkan (commands agentkan / ak)", "status": "done", "assignee": "me", "labels": ["docs"], "planned": null }
+            {
+              "id": "E1.1-T1",
+              "title": "Verify npm availability for candidate names",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.1-T2",
+              "title": "Evaluate discoverability vs brandability tradeoffs",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.1-T3",
+              "title": "Lock name: agentkan (commands agentkan / ak)",
+              "status": "done",
+              "assignee": "me",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -36,15 +65,44 @@
           "emoji": "⌨️",
           "status": "done",
           "assignee": "ai",
-          "labels": ["backend"],
+          "labels": [
+            "backend"
+          ],
           "planned": null,
           "order": 2,
           "goal": "Dependency-free CLI for init, epic new, serve, and validate.",
           "exit": "All four commands run without external deps on Node 18+.",
           "tasks": [
-            { "id": "E1.2-T1", "title": "bin/cli.mjs with init, epic new, serve, validate", "status": "done", "assignee": "ai", "labels": ["backend"], "planned": null },
-            { "id": "E1.2-T2", "title": "ak alias registered in package.json bin", "status": "done", "assignee": "ai", "labels": ["backend"], "planned": null },
-            { "id": "E1.2-T3", "title": "Help text and error messages", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null }
+            {
+              "id": "E1.2-T1",
+              "title": "bin/cli.mjs with init, epic new, serve, validate",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "backend"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.2-T2",
+              "title": "ak alias registered in package.json bin",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "backend"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.2-T3",
+              "title": "Help text and error messages",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -53,15 +111,44 @@
           "emoji": "🖥️",
           "status": "done",
           "assignee": "ai",
-          "labels": ["frontend"],
+          "labels": [
+            "frontend"
+          ],
           "planned": null,
           "order": 3,
           "goal": "One HTML file renders and edits the board with zero build step.",
           "exit": "Drag-and-drop columns, drawer edit, archive, and File System Access API save work on localhost.",
           "tasks": [
-            { "id": "E1.3-T1", "title": "assets/index.html kanban UI", "status": "done", "assignee": "ai", "labels": ["frontend"], "planned": null },
-            { "id": "E1.3-T2", "title": "Read-write via File System Access API + IndexedDB handle", "status": "done", "assignee": "ai", "labels": ["frontend"], "planned": null },
-            { "id": "E1.3-T3", "title": "Theme driven from board.tokens.json", "status": "done", "assignee": "ai", "labels": ["frontend"], "planned": null }
+            {
+              "id": "E1.3-T1",
+              "title": "assets/index.html kanban UI",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "frontend"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.3-T2",
+              "title": "Read-write via File System Access API + IndexedDB handle",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "frontend"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.3-T3",
+              "title": "Theme driven from board.tokens.json",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "frontend"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -70,14 +157,35 @@
           "emoji": "✅",
           "status": "done",
           "assignee": "ai",
-          "labels": ["backend", "verify"],
+          "labels": [
+            "backend",
+            "verify"
+          ],
           "planned": null,
           "order": 4,
           "goal": "JSON Schema for editors plus a custom validator for CI.",
           "exit": "agentkan validate catches bad statuses, dup IDs, orphan tasks, and unknown labels.",
           "tasks": [
-            { "id": "E1.4-T1", "title": "assets/roadmap.schema.json", "status": "done", "assignee": "ai", "labels": ["backend"], "planned": null },
-            { "id": "E1.4-T2", "title": "lib/validate.mjs with cross-cutting checks", "status": "done", "assignee": "ai", "labels": ["verify"], "planned": null }
+            {
+              "id": "E1.4-T1",
+              "title": "assets/roadmap.schema.json",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "backend"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.4-T2",
+              "title": "lib/validate.mjs with cross-cutting checks",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -86,14 +194,34 @@
           "emoji": "📋",
           "status": "done",
           "assignee": "ai",
-          "labels": ["infra"],
+          "labels": [
+            "infra"
+          ],
           "planned": null,
           "order": 5,
           "goal": "agentkan init copies a complete board into any project.",
           "exit": "init writes roadmap, archive, next, tokens, viewer, schema, and epics/.",
           "tasks": [
-            { "id": "E1.5-T1", "title": "templates/ for JSON and epic.md", "status": "done", "assignee": "ai", "labels": ["infra"], "planned": null },
-            { "id": "E1.5-T2", "title": "lib/init.mjs with --force and --project", "status": "done", "assignee": "ai", "labels": ["backend"], "planned": null }
+            {
+              "id": "E1.5-T1",
+              "title": "templates/ for JSON and epic.md",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "infra"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.5-T2",
+              "title": "lib/init.mjs with --force and --project",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "backend"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -102,14 +230,34 @@
           "emoji": "🤖",
           "status": "done",
           "assignee": "ai",
-          "labels": ["docs"],
+          "labels": [
+            "docs"
+          ],
           "planned": null,
           "order": 6,
           "goal": "Skill teaches AI-proposes-human-disposes and epic interview flow.",
           "exit": "skill/SKILL.md covers editing rules, interview, and handoff.",
           "tasks": [
-            { "id": "E1.6-T1", "title": "skill/SKILL.md with triggers and conventions", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.6-T2", "title": "docs/skill.md mirrors install instructions", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null }
+            {
+              "id": "E1.6-T1",
+              "title": "skill/SKILL.md with triggers and conventions",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.6-T2",
+              "title": "docs/skill.md mirrors install instructions",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -118,14 +266,34 @@
           "emoji": "🧪",
           "status": "done",
           "assignee": "ai",
-          "labels": ["verify"],
+          "labels": [
+            "verify"
+          ],
           "planned": null,
           "order": 7,
           "goal": "Runnable sample and automated smoke test for CI.",
           "exit": "npm test passes: init, validate, epic new, validate, catch bad status.",
           "tasks": [
-            { "id": "E1.7-T1", "title": "examples/sample-board with realistic epics", "status": "done", "assignee": "ai", "labels": ["verify"], "planned": null },
-            { "id": "E1.7-T2", "title": "test/smoke.mjs end-to-end CLI test", "status": "done", "assignee": "ai", "labels": ["verify"], "planned": null }
+            {
+              "id": "E1.7-T1",
+              "title": "examples/sample-board with realistic epics",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.7-T2",
+              "title": "test/smoke.mjs end-to-end CLI test",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -134,16 +302,45 @@
           "emoji": "📚",
           "status": "done",
           "assignee": "ai",
-          "labels": ["docs"],
+          "labels": [
+            "docs"
+          ],
           "planned": null,
           "order": 8,
           "goal": "Full docs for getting started, data model, viewer, skill, and distribution.",
           "exit": "README links to five docs/ pages; content matches CLI behavior.",
           "body": "epics/E1.8.md",
           "tasks": [
-            { "id": "E1.8-T1", "title": "README.md with why, install, layout", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.8-T2", "title": "docs/getting-started, data-model, viewer, skill, distribution", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.8-T3", "title": "MIT LICENSE", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null }
+            {
+              "id": "E1.8-T1",
+              "title": "README.md with why, install, layout",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.8-T2",
+              "title": "docs/getting-started, data-model, viewer, skill, distribution",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.8-T3",
+              "title": "MIT LICENSE",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -152,16 +349,55 @@
           "emoji": "🧹",
           "status": "done",
           "assignee": "ai",
-          "labels": ["infra", "ops"],
+          "labels": [
+            "infra",
+            "ops"
+          ],
           "planned": "2026-06-22",
           "order": 9,
           "goal": ".gitignore, correct GitHub metadata, and validate script covers dogfood board.",
           "exit": "package.json points at HasanKhatib/agentkan; no USER placeholders remain.",
           "tasks": [
-            { "id": "E1.9-T1", "title": "Add .gitignore", "status": "done", "assignee": "ai", "labels": ["infra"], "planned": null },
-            { "id": "E1.9-T2", "title": "Fix HasanKhatib placeholders in package.json and distribution.md", "status": "done", "assignee": "ai", "labels": ["ops"], "planned": null },
-            { "id": "E1.9-T3", "title": "Add author, homepage, bugs to package.json", "status": "done", "assignee": "ai", "labels": ["ops"], "planned": null },
-            { "id": "E1.9-T4", "title": "Extend validate script to include docs/board", "status": "done", "assignee": "ai", "labels": ["verify"], "planned": null }
+            {
+              "id": "E1.9-T1",
+              "title": "Add .gitignore",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "infra"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.9-T2",
+              "title": "Fix HasanKhatib placeholders in package.json and distribution.md",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.9-T3",
+              "title": "Add author, homepage, bugs to package.json",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.9-T4",
+              "title": "Extend validate script to include docs/board",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -170,14 +406,34 @@
           "emoji": "⚙️",
           "status": "done",
           "assignee": "ai",
-          "labels": ["infra"],
+          "labels": [
+            "infra"
+          ],
           "planned": "2026-06-22",
           "order": 10,
           "goal": "GitHub Actions runs smoke test on push and PR.",
           "exit": "ci.yml passes on Node 18, 20, and 22.",
           "tasks": [
-            { "id": "E1.10-T1", "title": "Add .github/workflows/ci.yml", "status": "done", "assignee": "ai", "labels": ["infra"], "planned": null },
-            { "id": "E1.10-T2", "title": "Verify CI green on first push", "status": "done", "assignee": "me", "labels": ["verify"], "planned": null }
+            {
+              "id": "E1.10-T1",
+              "title": "Add .github/workflows/ci.yml",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "infra"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.10-T2",
+              "title": "Verify CI green on first push",
+              "status": "done",
+              "assignee": "me",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -186,16 +442,54 @@
           "emoji": "✏️",
           "status": "done",
           "assignee": "ai",
-          "labels": ["docs"],
+          "labels": [
+            "docs"
+          ],
           "planned": null,
           "order": 11,
           "goal": "Origin doc, README nits, skill bundling with data-model.",
           "exit": "docs/origin.md exists; skill installs standalone; pack-skill script works.",
           "tasks": [
-            { "id": "E1.11-T1", "title": "Add docs/origin.md decision record", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.11-T2", "title": "README tweak for examples vs npx path", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.11-T3", "title": "Copy data-model into skill/ and update SKILL.md", "status": "done", "assignee": "ai", "labels": ["docs"], "planned": null },
-            { "id": "E1.11-T4", "title": "Add scripts/pack-skill.sh", "status": "done", "assignee": "ai", "labels": ["infra"], "planned": null }
+            {
+              "id": "E1.11-T1",
+              "title": "Add docs/origin.md decision record",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.11-T2",
+              "title": "README tweak for examples vs npx path",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.11-T3",
+              "title": "Copy data-model into skill/ and update SKILL.md",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "docs"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.11-T4",
+              "title": "Add scripts/pack-skill.sh",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "infra"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -204,14 +498,34 @@
           "emoji": "📦",
           "status": "done",
           "assignee": "me",
-          "labels": ["ops"],
+          "labels": [
+            "ops"
+          ],
           "planned": null,
           "order": 12,
           "goal": "Package live on npm for npx agentkan.",
           "exit": "npx agentkan init works from the public registry.",
           "tasks": [
-            { "id": "E1.12-T1", "title": "npm publish --access public", "status": "done", "assignee": "me", "labels": ["ops"], "planned": null },
-            { "id": "E1.12-T2", "title": "Verify npx agentkan runs", "status": "done", "assignee": "me", "labels": ["verify"], "planned": null }
+            {
+              "id": "E1.12-T1",
+              "title": "npm publish --access public",
+              "status": "done",
+              "assignee": "me",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.12-T2",
+              "title": "Verify npx agentkan runs",
+              "status": "done",
+              "assignee": "me",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -220,14 +534,34 @@
           "emoji": "🐙",
           "status": "done",
           "assignee": "me",
-          "labels": ["ops"],
+          "labels": [
+            "ops"
+          ],
           "planned": null,
           "order": 13,
           "goal": "Source on GitHub with initial commit on main.",
           "exit": "HasanKhatib/agentkan main branch matches local repo.",
           "tasks": [
-            { "id": "E1.13-T1", "title": "Initial commit", "status": "done", "assignee": "ai", "labels": ["ops"], "planned": null },
-            { "id": "E1.13-T2", "title": "git push -u origin main", "status": "done", "assignee": "me", "labels": ["ops"], "planned": null }
+            {
+              "id": "E1.13-T1",
+              "title": "Initial commit",
+              "status": "done",
+              "assignee": "ai",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.13-T2",
+              "title": "git push -u origin main",
+              "status": "done",
+              "assignee": "me",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            }
           ]
         },
         {
@@ -236,15 +570,44 @@
           "emoji": "🔖",
           "status": "active",
           "assignee": "me",
-          "labels": ["ops"],
+          "labels": [
+            "ops"
+          ],
           "planned": null,
           "order": 14,
           "goal": "Republish with correct repository URL and metadata.",
           "exit": "npm view agentkan shows HasanKhatib/agentkan repository link.",
           "tasks": [
-            { "id": "E1.14-T1", "title": "Bump version to 0.1.1", "status": "done", "assignee": "me", "labels": ["ops"], "planned": null },
-            { "id": "E1.14-T2", "title": "npm publish --access public", "status": "doing", "assignee": "me", "labels": ["ops"], "planned": null },
-            { "id": "E1.14-T3", "title": "Verify npm view repository URL", "status": "todo", "assignee": "me", "labels": ["verify"], "planned": null }
+            {
+              "id": "E1.14-T1",
+              "title": "Bump version to 0.1.1",
+              "status": "done",
+              "assignee": "me",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.14-T2",
+              "title": "npm publish --access public",
+              "status": "todo",
+              "assignee": "me",
+              "labels": [
+                "ops"
+              ],
+              "planned": null
+            },
+            {
+              "id": "E1.14-T3",
+              "title": "Verify npm view repository URL",
+              "status": "todo",
+              "assignee": "me",
+              "labels": [
+                "verify"
+              ],
+              "planned": null
+            }
           ]
         }
       ]
