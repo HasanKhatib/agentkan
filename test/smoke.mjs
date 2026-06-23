@@ -20,7 +20,7 @@ try {
   let r = run(["init"], tmp);
   ok(r.status === 0, "init exits 0");
   const board = path.join(tmp, "docs", "board");
-  for (const f of ["roadmap.json", "archive.json", "next.json", "board.tokens.json", "index.html", "roadmap.schema.json"]) {
+  for (const f of ["roadmap.json", "archive.json", "next.json", "board.tokens.json", "index.html", "favicon.svg", "roadmap.schema.json"]) {
     ok(await access(path.join(board, f)).then(() => true).catch(() => false), "init wrote " + f);
   }
 
