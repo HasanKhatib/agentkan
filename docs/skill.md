@@ -21,8 +21,10 @@ SKILLS/agentkan/
     AGENTS.snippet.md         # Merge into consumer AGENTS.md
     CLAUDE.snippet.md
     next.template.json
+    session.template.md       # Optional docs/sessions/ log
   scripts/
     validate-board.sh         # npx agentkan validate wrapper
+    status.sh                 # git + next.json snapshot before handoff
 ```
 
 **Tool repo vs consumer repo:** This repository's `AGENTS.md` is for **developing** agentkan. Projects that use agentkan merge `assets/AGENTS.snippet.md` into their own `AGENTS.md`.
@@ -85,6 +87,6 @@ When you say "add an epic" or "fill epic E1.2", the agent:
 
 ### Handoff
 
-Say "handoff" at session end. The agent sets statuses to reality, refreshes `next.json`, validates, and summarizes briefly.
+Say "handoff" at session end. The agent runs a git snapshot (`scripts/status.sh`), sets statuses to reality, refreshes `next.json`, validates, summarizes briefly, and optionally writes a session log to `docs/sessions/`.
 
 Full instructions: [SKILLS/agentkan/SKILL.md](../SKILLS/agentkan/SKILL.md).

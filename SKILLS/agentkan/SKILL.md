@@ -47,7 +47,7 @@ npx agentkan serve [dir]                open board on localhost (human operates)
 npx agentkan validate [dir]             schema gate — run after every edit
 ```
 
-Optional: `bash scripts/validate-board.sh <board-dir>` from this skill folder.
+Optional: `bash scripts/validate-board.sh <board-dir>` or `bash scripts/status.sh <board-dir>` before handoff.
 
 ## Boundaries
 

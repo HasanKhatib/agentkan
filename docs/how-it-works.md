@@ -128,10 +128,12 @@ Unknown labels validate with a warning and render without an emoji. Add real voc
 
 Say "handoff" or "wrap up". Your agent should:
 
-1. Set task and epic statuses to match reality.
-2. Refresh `next.json` (`next`, `criticalPath`, `risks`).
-3. Bump `updated` dates if it edited JSON directly.
-4. Run `agentkan validate` and summarize briefly.
+1. Run the skill's `status.sh` for a git snapshot and current `next.json`.
+2. Set task and epic statuses to match reality.
+3. Refresh `next.json` (`next`, `criticalPath`, `risks`).
+4. Bump `updated` dates if it edited JSON directly.
+5. Run `agentkan validate` and summarize briefly.
+6. Optionally ask to write a session log under `docs/sessions/`.
 
 Agents must not mark an epic `done` or archive unless you ask in that turn. That is your job on the board.
 

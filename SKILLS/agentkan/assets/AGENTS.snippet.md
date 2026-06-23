@@ -6,7 +6,7 @@ Board directory: `{{BOARD_DIR}}/`. State lives in JSON (`roadmap.json`, `next.js
 
 **Board work:** follow the installed `agentkan` skill. After edits: `npx agentkan validate {{BOARD_DIR}}`.
 
-**End (handoff):** set statuses to reality, refresh `next.json` (`next`, `criticalPath`, `risks`), validate, summarize briefly.
+**End (handoff):** run agentkan handoff — status snapshot, update board, validate, optionally log to `docs/sessions/`.
 
 **Human owns:** dragging epics to Done and archiving in the viewer (`npx agentkan serve {{BOARD_DIR}}`).
 
