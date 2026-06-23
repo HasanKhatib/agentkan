@@ -5,11 +5,9 @@
   "criticalPath": [
     { "title": "Register production domain", "assignee": "me", "status": "todo", "unblocks": "E1.3" }
   ],
-  "revenueBlockers": [
+  "risks": [
     "Production deploy live (E1.3)",
-    "Billing not started yet"
-  ],
-  "fragile": [
+    "Billing not started yet",
     "Session refresh not covered by tests yet."
   ]
 }

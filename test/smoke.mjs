@@ -29,7 +29,7 @@ try {
   ok(r.status === 0, "validate passes on fresh board");
 
   // 3. epic new
-  r = run(["epic", "new", "Payments integration", "--assignee", "ai+verify", "--labels", "backend,api"], tmp);
+  r = run(["epic", "new", "Payments integration", "--assignee", "ai+verify", "--labels", "feature,chore"], tmp);
   ok(r.status === 0, "epic new exits 0");
   const roadmap = JSON.parse(await readFile(path.join(board, "roadmap.json"), "utf8"));
   const ids = roadmap.phases.flatMap((p) => p.epics.map((e) => e.id));
