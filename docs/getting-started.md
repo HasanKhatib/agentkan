@@ -30,11 +30,9 @@ Pick a different directory with `npx agentkan init path/to/dir`. Re-running
 npx agentkan serve
 ```
 
-This serves `docs/board/` on `http://localhost:4173` and opens it. Serving on
-localhost guarantees the read-write **File System Access API** works in Chrome
-and Edge. Click **Enable editing** once to grant the folder; after that the
-board reconnects automatically and every drag, edit, and archive saves straight
-back to the JSON files.
+This serves `docs/board/` on `http://localhost:4173` and opens it. A served
+board is read-write in any browser: every drag, edit, and archive saves straight
+back to the JSON files through the local server, with no folder dialog.
 
 You can also just open `index.html` from disk for a read-only view.
 
@@ -67,4 +65,4 @@ npx agentkan validate docs/board
 ```
 
 That's the whole loop: AI adds and advances work, you watch the board and drag
-cards to Done.
+cards to Done. For detailed scenarios see [how it works](how-it-works.md).

@@ -30,7 +30,7 @@ if opacity is acceptable.
 ## Locked delivery plan
 
 - Dependency-free CLI: `init`, `epic new`, `serve`, `validate`
-- Single-file viewer (`index.html`), zero build, File System Access API on localhost
+- Single-file viewer (`index.html`), zero build, read-write on localhost via the serve API
 - Hybrid JSON state + markdown epic bodies
 - AI proposes, human disposes
 - Local verification via `npm pack` before registry publish
