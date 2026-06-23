@@ -1,0 +1,16 @@
+{
+  "updated": "YYYY-MM-DD",
+  "next": null,
+  "note": "One line: why this is the most important next action.",
+  "criticalPath": [
+    {
+      "title": "Human-only blocker example",
+      "assignee": "me",
+      "status": "todo",
+      "unblocks": "E1.3"
+    }
+  ],
+  "risks": [
+    "Plain string: fragile area or known blocker"
+  ]
+}

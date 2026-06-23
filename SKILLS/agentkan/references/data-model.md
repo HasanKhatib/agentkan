@@ -1,8 +1,8 @@
 # The data model
 
-Three JSON files plus markdown bodies. The JSON Schema is
-`assets/roadmap.schema.json`; `agentkan validate` enforces it plus a few rules
-JSON Schema can't express (unique IDs, task-belongs-to-epic, known labels).
+Three JSON files plus markdown bodies. The JSON Schema is `roadmap.schema.json`
+in the board directory; `agentkan validate` enforces it plus a few rules JSON
+Schema can't express (unique IDs, task-belongs-to-epic, known labels).
 
 ## roadmap.json — the live board
 
@@ -34,7 +34,7 @@ JSON Schema can't express (unique IDs, task-belongs-to-epic, known labels).
   "emoji": "🧭",
   "status": "active",                 // backlog | next | active | blocked | done
   "assignee": "ai+verify",            // ai | me | ai+verify
-  "labels": ["frontend", "design"],   // must exist in board.tokens.json
+  "labels": ["frontend", "design"],   // free-form; tokens only add an emoji
   "planned": "2026-06-25",            // YYYY-MM-DD or null
   "order": 2,                          // integer; controls position in a column
   "goal": "One line: what done looks like.",
@@ -79,17 +79,20 @@ Thin by design. Don't re-derive epic lists here; point at them.
   "criticalPath": [                    // human-only, external-clock work
     { "title": "Register domain", "assignee": "me", "status": "todo", "unblocks": "E1.3" }
   ],
-  "revenueBlockers": ["..."],          // plain strings
-  "fragile": ["..."]                   // what's known-broken or risky
+  "risks": ["..."]                     // known-broken, blocking, or risky — plain strings
 }
 ```
+
+The viewer's "Up next" surface resolves `next` against the board, so it can be a
+task id (`E1.2-T1`), an epic id (`E1.2`), or free text.
 
 ## board.tokens.json — theme & vocabulary
 
 The viewer is fully data-driven from this file: map `theme` to your project's
-design tokens and define the emoji for each assignee, status, and label. No code
-change is needed to re-skin a board. Labels not listed here still work but render
-without an emoji.
+design tokens and define the emoji for each assignee and status. No code change
+is needed to re-skin a board. **Labels are free-form** — any string is valid and
+`validate` never rejects one. The `labels` map here only assigns an emoji to the
+common ones; unknown labels render without an emoji and still appear as filters.
 
 ## Design rules worth keeping
 
