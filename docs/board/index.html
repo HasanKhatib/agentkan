@@ -6,24 +6,63 @@
 <title>agentkan board</title>
 <style>
   :root {
-    /* Defaults; overridden at runtime from board.tokens.json -> theme */
-    --bg-canvas: #F7F8FA;
+    /* Defaults; overridden at runtime from board.tokens.json -> theme.
+       Palette follows a clean modern-SaaS direction: white canvas, light-gray
+       column surfaces, hairline borders, near-black primary. */
+    --bg-canvas: #FFFFFF;
     --bg-surface: #FFFFFF;
-    --bg-sunken: #EEF1F5;
-    --brand: #3B82F6;
-    --brand-hover: #2563EB;
-    --brand-subtle: #EAF2FE;
-    --accent: #F59E0B;
-    --text-primary: #1F2937;
+    --bg-sunken: #F5F5F5;
+    --brand: #111111;
+    --brand-hover: #242424;
+    --brand-subtle: #F3F4F6;
+    --accent: #3B82F6;
+    --text-primary: #111111;
     --text-secondary: #6B7280;
     --border: #E5E7EB;
-    --warning: #D97706;
-    --danger: #DC2626;
-    --success: #16A34A;
-    --radius: 12px;
-    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 12px rgba(16,24,40,.06);
-    --shadow-lg: 0 12px 32px rgba(16,24,40,.16);
-    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "IBM Plex Sans Arabic", system-ui, sans-serif;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --success: #10B981;
+
+    /* contrast-safe inversion pairs: text never collides with its background */
+    --primary: #111111;
+    --primary-fg: #FFFFFF;
+    --inverse-bg: #111111;
+    --inverse-fg: #FFFFFF;
+    --date-overdue-bg: #FEF2F2;
+    --date-soon-bg: #FFFBEB;
+
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-pill: 9999px;
+    --shadow: 0 1px 2px rgba(17,17,17,.05);
+    --shadow-lg: 0 12px 32px rgba(17,17,17,.12);
+    --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "IBM Plex Sans Arabic", sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  /* Built-in dark palette — kept high-contrast so text stays readable.
+     board.tokens.json `theme` customizes light; `themeDark` (optional) customizes dark. */
+  :root[data-theme="dark"] {
+    --bg-canvas: #0B0C0E;
+    --bg-surface: #141518;
+    --bg-sunken: #1B1D21;
+    --brand: #F3F4F6;
+    --brand-hover: #E5E7EB;
+    --brand-subtle: #23262C;
+    --accent: #60A5FA;
+    --text-primary: #F3F4F6;
+    --text-secondary: #9CA3AF;
+    --border: #2A2D33;
+    --warning: #FBBF24;
+    --danger: #F87171;
+    --success: #34D399;
+    --primary: #F3F4F6;
+    --primary-fg: #111111;
+    --inverse-bg: #F3F4F6;
+    --inverse-fg: #111111;
+    --date-overdue-bg: #3A1D1D;
+    --date-soon-bg: #3A2E15;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
@@ -32,133 +71,272 @@
     color: var(--text-primary);
     background: var(--bg-canvas);
     font-size: 14px;
-    line-height: 1.45;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
   button { font-family: inherit; cursor: pointer; }
-  a { color: var(--brand); }
+  a { color: var(--accent); }
+  ul { margin: 0; }
 
-  /* ---------- Header ---------- */
-  header {
-    position: sticky; top: 0; z-index: 20;
-    background: var(--bg-surface);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .h-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .title { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
-  .updated { color: var(--text-secondary); font-size: 12px; }
+  /* ---------- Shell ---------- */
+  .shell { display: flex; min-height: 100vh; }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .spacer { flex: 1; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    width: 264px; flex: 0 0 264px; background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    transition: width .2s ease, flex-basis .2s ease, border-color .2s ease;
+  }
+  .sidebar-inner {
+    width: 264px; height: 100vh; overflow-y: auto; padding: 16px 14px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  @media (min-width: 861px) {
+    .shell.side-collapsed .sidebar { width: 0; flex-basis: 0; border-right-color: transparent; }
+  }
+  .side-brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 7px; background: var(--primary); color: var(--primary-fg);
+    font-size: 13px; font-weight: 700; letter-spacing: -.04em; flex: 0 0 auto;
+  }
+  .title { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+  .updated { color: var(--text-secondary); font-size: 11px; }
+  .side-sec { display: flex; flex-direction: column; gap: 8px; }
+  .side-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); }
+  .side-h-row { display: flex; align-items: center; justify-content: space-between; }
+  .linkbtn { border: none; background: none; color: var(--accent); font-size: 12px; padding: 2px 0; font-weight: 500; }
+
+  .seg { display: inline-flex; background: var(--bg-sunken); border-radius: var(--r-pill); padding: 3px; gap: 2px; }
+  .seg button { flex: 1; border: none; background: none; border-radius: var(--r-pill); padding: 7px 10px; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .seg button.on { background: var(--bg-surface); color: var(--text-primary); box-shadow: var(--shadow); font-weight: 600; }
+
+  .side-now { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px; background: var(--bg-canvas); }
+  .side-now.clickable { cursor: pointer; transition: box-shadow .12s, border-color .12s; }
+  .side-now.clickable:hover { box-shadow: var(--shadow-lg); border-color: #d4d7dd; }
+  .side-mini { margin-top: 4px; }
+  .side-mini ul { padding-left: 16px; }
+  .side-mini li { font-size: 12px; margin: 2px 0; color: var(--text-secondary); }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20; background: var(--bg-surface);
+    border-bottom: 1px solid var(--border); padding: 12px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .viewtitle { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .topbar-brand .title { font-size: 15px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
+  .greeting { font-size: 11.5px; color: var(--text-secondary); line-height: 1.2; white-space: nowrap; }
+  @media (max-width: 520px) { .greeting { display: none; } }
+
+  /* ---------- Pills / buttons ---------- */
   .pill {
     border: 1px solid var(--border); background: var(--bg-surface);
-    border-radius: 999px; padding: 5px 11px; font-size: 12.5px; color: var(--text-primary);
-    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    border-radius: var(--r-pill); padding: 6px 11px; font-size: 12.5px; color: var(--text-primary);
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; line-height: 1;
+    transition: background .12s, border-color .12s, color .12s;
   }
-  .pill.on { background: var(--brand-subtle); border-color: var(--brand); color: var(--brand-hover); font-weight: 600; }
+  .pill:hover { border-color: #d4d7dd; }
+  .pill.on { background: var(--inverse-bg); border-color: var(--inverse-bg); color: var(--inverse-fg); font-weight: 600; }
   .pill.ghost { color: var(--text-secondary); }
+  .pill.ghost.on { color: var(--inverse-fg); }
+
   .btn {
     border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary);
-    border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500;
+    border-radius: var(--r-md); padding: 7px 12px; font-size: 13px; font-weight: 500; line-height: 1;
+    transition: background .12s, border-color .12s;
   }
-  .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
-  .btn.primary:hover { background: var(--brand-hover); }
+  .btn:hover { border-color: #d4d7dd; }
+  .btn.primary { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+  .btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); color: var(--primary-fg); }
   .btn:disabled { opacity: .5; cursor: default; }
-  .save-state { font-size: 12px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-secondary); }
+
+  .save-state {
+    font-size: 12px; color: var(--text-secondary);
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border); border-radius: var(--r-pill); padding: 5px 11px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-secondary); }
   .dot.ok { background: var(--success); }
   .dot.dirty { background: var(--warning); }
   .dot.ro { background: var(--text-secondary); }
-  input.search {
-    border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px;
-    min-width: 160px; background: var(--bg-canvas);
-  }
-  .filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .filters .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); margin-right: 2px; }
 
-  /* ---------- Next banner ---------- */
-  .next { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 10px 20px; }
-  .next-head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .next-head .k { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); }
-  .next-body { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-  .next-card { background: var(--bg-canvas); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
-  .next-card h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
-  .next-card ul { margin: 0; padding-left: 16px; }
-  .next-card li { margin: 3px 0; }
+  input.search {
+    border: 1px solid var(--border); border-radius: var(--r-md); padding: 7px 11px; font-size: 13px;
+    min-width: 200px; background: var(--bg-canvas); color: var(--text-primary);
+  }
+  input.search:focus { outline: none; border-color: var(--text-primary); }
+
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  /* ---------- Phase stepper ---------- */
+  .stepper { display: flex; gap: 8px; padding: 10px 24px; overflow-x: auto; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
+  .step { flex: 0 0 auto; min-width: 160px; border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 10px; cursor: pointer; background: var(--bg-canvas); transition: border-color .12s, background .12s; }
+  .step:hover { border-color: #d4d7dd; }
+  .step.active { border-color: var(--text-primary); }
+  .step.sel { background: var(--brand-subtle); }
+  .step .st-top { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
+  .step .st-you { margin-left: auto; font-size: 9.5px; text-transform: uppercase; letter-spacing: .04em; background: var(--inverse-bg); color: var(--inverse-fg); border-radius: var(--r-pill); padding: 1px 7px; }
+  .step .st-prog { margin-top: 7px; height: 4px; background: var(--bg-sunken); border-radius: 2px; overflow: hidden; }
+  .step .st-prog > i { display: block; height: 100%; background: var(--brand); }
+  .step .st-meta { font-size: 10.5px; color: var(--text-secondary); margin-top: 5px; }
+
+  /* ---------- Filter bar ---------- */
+  .filterbar { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: var(--bg-surface); }
+  .fb-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .fb-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); width: 68px; flex: 0 0 auto; }
+  .pill.add { font-weight: 700; color: var(--text-secondary); padding: 6px 10px; }
 
   /* ---------- Board ---------- */
-  .board { display: flex; gap: 14px; padding: 16px 20px 40px; overflow-x: auto; align-items: flex-start; min-height: 60vh; }
-  .col { background: var(--bg-sunken); border-radius: var(--radius); min-width: 270px; width: 270px; flex: 0 0 auto; display: flex; flex-direction: column; max-height: calc(100vh - 150px); }
-  .col-head { padding: 11px 13px; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; }
-  .col-head .nm { font-weight: 650; font-size: 13px; }
-  .col-head .ct { margin-left: auto; background: var(--bg-surface); border-radius: 999px; padding: 1px 8px; font-size: 12px; color: var(--text-secondary); }
-  .col.drop { outline: 2px dashed var(--brand); outline-offset: -4px; }
-  .col-list { padding: 0 9px 9px; overflow-y: auto; display: flex; flex-direction: column; gap: 9px; }
+  .board { display: flex; gap: 16px; padding: 20px 24px 48px; overflow-x: auto; align-items: flex-start; min-height: 60vh; }
+  .col { background: var(--bg-sunken); border-radius: var(--r-lg); min-width: 288px; width: 288px; flex: 0 0 auto; display: flex; flex-direction: column; max-height: calc(100vh - 190px); }
+  .col-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
+  .col-head .nm { font-weight: 600; font-size: 13px; letter-spacing: -.01em; }
+  .col-head .ct { margin-left: auto; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 1px 9px; font-size: 11.5px; color: var(--text-secondary); }
+  .col.drop { outline: 2px dashed var(--text-primary); outline-offset: -4px; }
+  .col-list { padding: 0 10px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
 
   .card {
-    background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 10px 11px; box-shadow: var(--shadow); cursor: grab; position: relative;
-    transition: box-shadow .12s, transform .12s;
+    background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-lg);
+    padding: 11px 12px; box-shadow: var(--shadow); cursor: grab; position: relative;
+    transition: box-shadow .12s, transform .12s, border-color .12s;
   }
-  .card:hover { box-shadow: var(--shadow-lg); }
+  .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); border-color: #d4d7dd; }
   .card.dragging { opacity: .5; }
-  .card.arch { background: repeating-linear-gradient(45deg, var(--bg-surface), var(--bg-surface) 9px, var(--bg-canvas) 9px, var(--bg-canvas) 18px); }
+  .card.arch { background: repeating-linear-gradient(45deg, var(--bg-surface), var(--bg-surface) 9px, var(--bg-sunken) 9px, var(--bg-sunken) 18px); }
   .card .ctop { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-  .card .eid { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; font-weight: 600; }
-  .card .emoji { font-size: 15px; }
-  .card .ctitle { font-size: 13.5px; font-weight: 550; line-height: 1.3; margin: 2px 0 8px; }
-  .card .chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
-  .chip { font-size: 11px; border-radius: 6px; padding: 1px 7px; border: 1px solid var(--border); background: var(--bg-canvas); color: var(--text-secondary); display: inline-flex; gap: 3px; align-items: center; }
-  .chip.assignee { background: var(--brand-subtle); border-color: transparent; color: var(--brand-hover); font-weight: 600; }
-  .chip.date { }
-  .chip.date.overdue { background: #FEECEC; border-color: transparent; color: var(--danger); font-weight: 600; }
-  .chip.date.soon { background: #FEF6E7; border-color: transparent; color: var(--warning); font-weight: 600; }
-  .progress { margin-top: 8px; height: 5px; background: var(--bg-sunken); border-radius: 3px; overflow: hidden; }
+  .eid { font-family: var(--mono); font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .emoji { font-size: 15px; }
+  .card .ctitle { font-size: 13.5px; font-weight: 550; line-height: 1.35; margin: 2px 0 9px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .chip { font-size: 11px; border-radius: var(--r-sm); padding: 2px 7px; border: 1px solid var(--border); background: var(--bg-canvas); color: var(--text-secondary); display: inline-flex; gap: 3px; align-items: center; }
+  .chip.assignee { background: var(--brand-subtle); border-color: transparent; color: var(--text-primary); font-weight: 600; }
+  .lbl-chips { margin-bottom: 8px; }
+  .chip-x { border: none; background: none; color: inherit; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 0 0 3px; opacity: .55; }
+  .chip-x:hover { opacity: 1; }
+  .chip.date.overdue { background: var(--date-overdue-bg); border-color: transparent; color: var(--danger); font-weight: 600; }
+  .chip.date.soon { background: var(--date-soon-bg); border-color: transparent; color: var(--warning); font-weight: 600; }
+  .progress { margin-top: 9px; height: 5px; background: var(--bg-sunken); border-radius: 3px; overflow: hidden; }
   .progress > i { display: block; height: 100%; background: var(--brand); }
-  .card .ptext { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+  .ptext { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
   .card.blocked-edge { border-left: 3px solid var(--danger); }
 
+  /* ---------- Timeline ---------- */
+  .timeline { padding: 20px 24px 48px; display: flex; flex-direction: column; gap: 24px; }
+  .lane { scroll-margin-top: 80px; }
+  .lane-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .lane-head .lh-title { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+  .lane-head .lh-you { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; background: var(--inverse-bg); color: var(--inverse-fg); border-radius: var(--r-pill); padding: 2px 9px; font-weight: 600; }
+  .lane-head .lh-prog { margin-left: auto; font-size: 11.5px; color: var(--text-secondary); }
+  .lane.active .lh-title { color: var(--text-primary); }
+  .lane-epics { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tbar {
+    width: 230px; border: 1px solid var(--border); border-left: 4px solid var(--st-color, var(--border));
+    border-radius: var(--r-md); padding: 10px 12px; background: var(--bg-surface); cursor: pointer;
+    box-shadow: var(--shadow); transition: box-shadow .12s, transform .12s;
+  }
+  .tbar:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .tbar.up { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tbar .tb-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .tbar .tb-title { font-size: 13px; font-weight: 550; line-height: 1.3; margin-bottom: 7px; }
+  .tbar .tb-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 11px; color: var(--text-secondary); }
+
   /* ---------- Drawer ---------- */
-  .scrim { position: fixed; inset: 0; background: rgba(16,24,40,.32); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  .scrim { position: fixed; inset: 0; background: rgba(17,17,17,.32); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .15s; }
   .scrim.open { opacity: 1; pointer-events: auto; }
   .drawer {
-    position: fixed; top: 0; right: 0; height: 100%; width: 440px; max-width: 92vw;
+    position: fixed; top: 0; right: 0; height: 100%; width: 480px; max-width: 94vw;
     background: var(--bg-surface); z-index: 50; box-shadow: var(--shadow-lg);
     transform: translateX(100%); transition: transform .18s ease; overflow-y: auto;
   }
   .drawer.open { transform: none; }
-  .dr-head { padding: 16px 18px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-surface); }
-  .dr-head .x { position: absolute; right: 14px; top: 14px; border: none; background: none; font-size: 20px; color: var(--text-secondary); }
-  .dr-head .eid { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
-  .dr-head h2 { margin: 4px 0 0; font-size: 17px; line-height: 1.25; }
-  .dr-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
-  .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); margin-bottom: 4px; }
+  .dr-head { padding: 18px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-surface); z-index: 2; }
+  .dr-head .x { position: absolute; right: 16px; top: 16px; border: none; background: none; font-size: 22px; color: var(--text-secondary); line-height: 1; }
+  .dr-head .eid { font-size: 12px; }
+  .dr-head h2 { margin: 6px 0 0; font-size: 18px; line-height: 1.25; letter-spacing: -.02em; font-weight: 600; padding-right: 28px; }
+  .dr-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
+  .field label { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); margin-bottom: 5px; }
   .field input, .field select, .field textarea {
-    width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; font-size: 13px; font-family: inherit; background: var(--bg-canvas); color: var(--text-primary);
+    width: 100%; border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 10px; font-size: 13px; font-family: inherit; background: var(--bg-canvas); color: var(--text-primary);
   }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--text-primary); }
   .field textarea { resize: vertical; min-height: 48px; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .ge { background: var(--bg-canvas); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; }
-  .ge .k { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
-  .ge .v { margin-top: 3px; font-size: 13px; }
+  .row2 { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+  .ge { background: var(--bg-sunken); border-radius: var(--r-md); padding: 10px 12px; }
+  .ge .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); }
+  .ge .v { margin-top: 4px; font-size: 13px; }
+  .now-title { font-size: 15px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+  .now-meta { font-size: 12px; color: var(--text-secondary); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 5px; }
+  .now-note { font-size: 12.5px; color: var(--text-secondary); margin-top: 7px; }
+
   .tasks { display: flex; flex-direction: column; gap: 6px; }
-  .task { display: flex; align-items: flex-start; gap: 8px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-canvas); }
-  .task .tk { font-size: 11px; color: var(--text-secondary); font-weight: 600; min-width: 48px; }
+  .task { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-canvas); }
+  .task .tk { font-family: var(--mono); font-size: 11px; color: var(--text-secondary); min-width: 32px; }
   .task .tt { flex: 1; font-size: 13px; }
-  .task.done .tt { text-decoration: line-through; color: var(--text-secondary); }
-  .task .st { border: none; background: none; font-size: 15px; cursor: pointer; }
+  .task .tt-edit { flex: 1; font-size: 13px; border: 1px solid transparent; border-radius: var(--r-sm); padding: 4px 6px; background: transparent; color: var(--text-primary); font-family: inherit; }
+  .task .tt-edit:hover { border-color: var(--border); }
+  .task .tt-edit:focus { outline: none; border-color: var(--text-primary); background: var(--bg-surface); }
+  .task.done .tt, .task.done .tt-edit { text-decoration: line-through; color: var(--text-secondary); }
+  .task .st { border: none; background: none; font-size: 15px; cursor: pointer; line-height: 1; flex: 0 0 auto; }
+  .task-actions { display: inline-flex; gap: 2px; }
+  .task .ti { border: none; background: none; color: var(--text-secondary); font-size: 13px; padding: 2px 4px; border-radius: var(--r-sm); }
+  .task .ti:hover { background: var(--bg-sunken); color: var(--text-primary); }
+
+  .cp-item { border: 1px solid var(--border); border-radius: var(--r-md); padding: 9px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; background: var(--bg-canvas); }
+
+  .lm-row { display: grid; grid-template-columns: 56px 1fr auto; gap: 8px; align-items: center; margin-top: 8px; }
+  .lm-row input { width: 100%; border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 9px; font-size: 13px; font-family: inherit; background: var(--bg-canvas); color: var(--text-primary); }
+  .lm-row input:focus { outline: none; border-color: var(--text-primary); }
+  .lm-emoji { text-align: center; }
+
+  /* body (markdown) */
+  .body-head { display: flex; align-items: center; gap: 8px; }
+  .body-head .grow { flex: 1; }
+  .md { font-size: 13px; }
+  .md h1, .md h2, .md h3, .md h4 { font-weight: 600; letter-spacing: -.01em; margin: 14px 0 6px; line-height: 1.3; }
+  .md h1 { font-size: 17px; }
+  .md h2 { font-size: 15px; }
+  .md h3, .md h4 { font-size: 13px; color: var(--text-secondary); }
+  .md p { margin: 6px 0; line-height: 1.6; }
+  .md ul, .md ol { margin: 6px 0; padding-left: 18px; }
+  .md li { margin: 3px 0; }
+  .md code { font-family: var(--mono); font-size: 12px; background: var(--bg-sunken); padding: 1px 5px; border-radius: 5px; }
+  .md pre { background: var(--bg-sunken); padding: 10px 12px; border-radius: var(--r-md); overflow: auto; }
+  .md pre code { background: none; padding: 0; }
+  .md blockquote { margin: 6px 0; padding: 4px 12px; border-left: 3px solid var(--border); color: var(--text-secondary); }
+  .body-edit { width: 100%; min-height: 280px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; border: 1px solid var(--border); border-radius: var(--r-md); padding: 12px; background: var(--bg-canvas); color: var(--text-primary); resize: vertical; }
+  .body-edit:focus { outline: none; border-color: var(--text-primary); }
+
   .dr-actions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
   .danger { color: var(--danger); border-color: #f3c0c0; }
+  .danger:hover { border-color: var(--danger); }
   .muted { color: var(--text-secondary); font-size: 12.5px; }
-  .hidden { display: none !important; }
 
-  /* ---------- Empty / connect screen ---------- */
-  .welcome { max-width: 560px; margin: 8vh auto; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 30px; box-shadow: var(--shadow); }
-  .welcome h1 { margin: 0 0 4px; font-size: 20px; }
-  .welcome p { color: var(--text-secondary); }
-  .welcome code { background: var(--bg-sunken); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; padding: 10px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); }
+  /* ---------- Legend ---------- */
+  .legend { display: flex; flex-direction: column; gap: 8px; font-size: 11.5px; color: var(--text-secondary); }
   .legend b { color: var(--text-primary); font-weight: 600; }
-  @media (max-width: 640px) { .col, .col { min-width: 84vw; width: 84vw; } }
+
+  /* ---------- Welcome ---------- */
+  .welcome { max-width: 560px; margin: 10vh auto; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 32px 34px; box-shadow: var(--shadow); }
+  .welcome h1 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.02em; font-weight: 600; }
+  .welcome p { color: var(--text-secondary); }
+  .welcome code { font-family: var(--mono); background: var(--bg-sunken); padding: 2px 7px; border-radius: 5px; font-size: 12.5px; }
+
+  /* ---------- Responsive ---------- */
+  .mobile-only { display: none; }
+  .side-scrim { display: none; }
+  @media (max-width: 860px) {
+    .sidebar { position: fixed; left: 0; top: 0; height: 100vh; z-index: 60; transform: translateX(-100%); transition: transform .18s ease; }
+    .shell.side-open .sidebar { transform: none; }
+    .side-scrim { position: fixed; inset: 0; background: rgba(17,17,17,.32); z-index: 55; }
+    .shell.side-open .side-scrim { display: block; }
+    .mobile-only { display: inline-flex; }
+    .col, .col { min-width: 84vw; width: 84vw; }
+  }
 </style>
 </head>
 <body>
@@ -168,39 +346,50 @@
 "use strict";
 /* ============================================================
    agentkan board — single-file, dependency-free.
-   Read-only by default (works behind `agentkan serve`); click
-   "Enable editing" to connect the folder read-write via the
-   File System Access API.
+   Read-write when served (`agentkan serve`): edits POST back to the
+   local server, no folder dialog. Read-only when opened over file://.
    ============================================================ */
 
 const STATUS_ORDER = ["backlog", "next", "active", "blocked", "done"];
 const TASK_CYCLE = { todo: "doing", doing: "done", done: "todo" };
+const STATUS_COLOR = {
+  backlog: "var(--text-secondary)", next: "var(--accent)", active: "var(--brand)",
+  blocked: "var(--danger)", done: "var(--success)",
+};
+
+const THEME_KEY = "ak-theme";
+const SIDEBAR_KEY = "ak-sidebar";
+const GREETINGS = [
+  "let's ship it 🚀", "back at it 💪", "ship happens 🚢", "what's cookin'? 👨‍🍳",
+  "another day, another epic 🧩", "tasks don't stand a chance 😤", "caffeine loaded ☕",
+  "big brain time 🧠", "no cap, just commits 🧢", "let's get this bread 🍞",
+  "stay shipping, friend 🛟", "vibes are immaculate ✨", "todo: conquer 🗡️", "make it nice ✨",
+];
+function initialTheme() {
+  const s = localStorage.getItem(THEME_KEY);
+  if (s === "light" || s === "dark") return s;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 const state = {
   tokens: null, roadmap: null, archive: null, next: null,
-  dirHandle: null,         // FileSystemDirectoryHandle when editing enabled
-  canWrite: false,
+  canWrite: location.protocol === "http:" || location.protocol === "https:",
   dirty: false, saving: false,
+  view: "board",                 // "board" | "timeline"
+  themeMode: initialTheme(),     // "light" | "dark"
+  greeting: GREETINGS[Math.floor(Math.random() * GREETINGS.length)],  // chosen once per load
   showArchived: false,
-  filter: { assignee: new Set(), label: new Set(), q: "" },
+  filter: { assignee: new Set(), label: new Set(), phase: new Set(), q: "" },
   openEpicId: null,
+  nextEditorOpen: false,
+  labelManagerOpen: false,
   legendOpen: false,
+  sidebarOpen: false,            // mobile slide-over
+  sidebarCollapsed: localStorage.getItem(SIDEBAR_KEY) === "1",  // desktop
+  body: null,                    // { id, text, loading, editing } for the open epic
 };
-
-/* ---------- tiny IndexedDB for the directory handle ---------- */
-const idb = {
-  db: null,
-  open() {
-    return new Promise((res) => {
-      const r = indexedDB.open("agentkan", 1);
-      r.onupgradeneeded = () => r.result.createObjectStore("kv");
-      r.onsuccess = () => { this.db = r.result; res(); };
-      r.onerror = () => res();
-    });
-  },
-  get(k) { return new Promise((res) => { if (!this.db) return res(null); const t = this.db.transaction("kv").objectStore("kv").get(k); t.onsuccess = () => res(t.result || null); t.onerror = () => res(null); }); },
-  set(k, v) { return new Promise((res) => { if (!this.db) return res(); const t = this.db.transaction("kv", "readwrite").objectStore("kv").put(v, k); t.onsuccess = () => res(); t.onerror = () => res(); }); },
-};
+// Set the theme attribute before first paint to avoid a flash.
+document.documentElement.dataset.theme = state.themeMode;
 
 /* ---------- helpers ---------- */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -210,12 +399,14 @@ const el = (tag, props = {}, ...kids) => {
     if (k === "class") n.className = v;
     else if (k === "html") n.innerHTML = v;
     else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
-    else if (v !== null && v !== undefined) n.setAttribute(k, v);
+    else if (v === true) n.setAttribute(k, "");          // boolean attr: present
+    else if (v === false || v === null || v === undefined) { /* boolean attr: absent */ }
+    else n.setAttribute(k, v);
   }
   for (const c of kids.flat()) if (c != null) n.append(c.nodeType ? c : document.createTextNode(c));
   return n;
 };
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const today = () => new Date().toISOString().slice(0, 10);
 
 function assigneeMeta(a) { return state.tokens?.assignees?.[a] || { emoji: "", label: a || "" }; }
 function statusMeta(s) { return state.tokens?.statuses?.[s] || { emoji: "", label: s }; }
@@ -234,6 +425,40 @@ function relDate(iso) {
   return { txt, cls };
 }
 
+/* ---------- minimal markdown -> HTML (zero-dep) ---------- */
+function mdToHtml(md) {
+  const e = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const inline = (t) => e(t)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  const lines = String(md).replace(/\r\n/g, "\n").split("\n");
+  let html = "", inCode = false, code = [], listType = null, listBuf = [];
+  const flush = () => { if (listType) { html += `<${listType}>` + listBuf.map((li) => `<li>${inline(li)}</li>`).join("") + `</${listType}>`; listType = null; listBuf = []; } };
+  for (const raw of lines) {
+    if (/^```/.test(raw)) {
+      if (inCode) { html += `<pre><code>${e(code.join("\n"))}</code></pre>`; code = []; inCode = false; }
+      else { flush(); inCode = true; }
+      continue;
+    }
+    if (inCode) { code.push(raw); continue; }
+    const h = /^(#{1,6})\s+(.*)$/.exec(raw);
+    if (h) { flush(); const lv = h[1].length; html += `<h${lv}>${inline(h[2])}</h${lv}>`; continue; }
+    const ul = /^\s*[-*]\s+(.*)$/.exec(raw);
+    const ol = /^\s*\d+\.\s+(.*)$/.exec(raw);
+    if (ul) { if (listType && listType !== "ul") flush(); listType = "ul"; listBuf.push(ul[1]); continue; }
+    if (ol) { if (listType && listType !== "ol") flush(); listType = "ol"; listBuf.push(ol[1]); continue; }
+    const bq = /^>\s?(.*)$/.exec(raw);
+    if (bq) { flush(); html += `<blockquote>${inline(bq[1])}</blockquote>`; continue; }
+    if (raw.trim() === "") { flush(); continue; }
+    flush(); html += `<p>${inline(raw)}</p>`;
+  }
+  if (inCode) html += `<pre><code>${e(code.join("\n"))}</code></pre>`;
+  flush();
+  return html;
+}
+
 /* ---------- data access ---------- */
 function allEpics() {
   const out = [];
@@ -245,7 +470,34 @@ function allEpics() {
 }
 function findEpic(id) { return allEpics().find((x) => x.epic.id === id) || null; }
 
-function passesFilter(e) {
+// All labels actually present on the board, so new free-form labels surface as filters.
+function usedLabels() {
+  const s = new Set();
+  for (const x of allEpics()) {
+    for (const l of x.epic.labels || []) s.add(l);
+    for (const t of x.epic.tasks || []) for (const l of t.labels || []) s.add(l);
+  }
+  return s;
+}
+function labelKeys() {
+  return [...new Set([...Object.keys(state.tokens?.labels || {}), ...usedLabels()])].sort();
+}
+
+// Resolve a next.json pointer (task id, epic id, or free text) to a readable action.
+function resolveNext(ref) {
+  if (!ref) return null;
+  const tm = /^(.+)-T\d+$/.exec(ref);
+  if (tm) {
+    const x = findEpic(tm[1]);
+    const t = x && (x.epic.tasks || []).find((t) => t.id === ref);
+    if (x && t) return { title: t.title, epic: x.epic, assignee: t.assignee || x.epic.assignee };
+  }
+  const x = findEpic(ref);
+  if (x) return { title: x.epic.title, epic: x.epic, assignee: x.epic.assignee };
+  return { title: ref, epic: null, assignee: null };
+}
+
+function epicMatches(e) {
   const f = state.filter;
   if (f.assignee.size && !f.assignee.has(e.assignee)) return false;
   if (f.label.size && !(e.labels || []).some((l) => f.label.has(l))) return false;
@@ -255,6 +507,8 @@ function passesFilter(e) {
   }
   return true;
 }
+function phaseSelected(id) { const f = state.filter.phase; return !f.size || f.has(id); }
+function phaseProgress(p) { const eps = p.epics || []; return { done: eps.filter((e) => e.status === "done").length, total: eps.length }; }
 
 /* ---------- load ---------- */
 async function readJSON(path) {
@@ -262,29 +516,21 @@ async function readJSON(path) {
   if (!r.ok) throw new Error(path + " " + r.status);
   return r.json();
 }
-async function loadReadOnly() {
+async function load() {
   state.tokens = await readJSON("./board.tokens.json").catch(() => null);
   state.roadmap = await readJSON("./roadmap.json");
   state.archive = await readJSON("./archive.json").catch(() => ({ version: 1, epics: [] }));
   state.next = await readJSON("./next.json").catch(() => null);
 }
-async function readFromDir(name, fallback) {
-  try { const fh = await state.dirHandle.getFileHandle(name); const f = await fh.getFile(); return JSON.parse(await f.text()); }
-  catch { return fallback; }
-}
-async function loadFromDir() {
-  state.tokens = await readFromDir("board.tokens.json", state.tokens);
-  state.roadmap = await readFromDir("roadmap.json", state.roadmap);
-  state.archive = await readFromDir("archive.json", { version: 1, epics: [] });
-  state.next = await readFromDir("next.json", state.next);
-}
 
-/* ---------- save ---------- */
-async function writeJSON(name, obj) {
-  const fh = await state.dirHandle.getFileHandle(name, { create: true });
-  const w = await fh.createWritable();
-  await w.write(JSON.stringify(obj, null, 2) + "\n");
-  await w.close();
+/* ---------- save (via the local server, no dialog) ---------- */
+async function saveJSON(name, obj) {
+  const r = await fetch("/api/file/" + name, { method: "PUT", body: JSON.stringify(obj, null, 2) + "\n" });
+  if (!r.ok) throw new Error(name + ": " + r.status);
+}
+async function saveBody(id, md) {
+  const r = await fetch("/api/epic/" + id, { method: "PUT", body: md });
+  if (!r.ok) throw new Error(id + ".md: " + r.status);
 }
 let saveTimer = null;
 function scheduleSave() {
@@ -297,31 +543,42 @@ async function doSave() {
   if (!state.canWrite || state.saving) return;
   state.saving = true; renderSaveState();
   try {
-    state.roadmap.updated = new Date().toISOString().slice(0, 10);
-    await writeJSON("roadmap.json", state.roadmap);
-    await writeJSON("archive.json", state.archive);
+    state.roadmap.updated = today();
+    await saveJSON("roadmap.json", state.roadmap);
+    await saveJSON("archive.json", state.archive);
+    state.dirty = false;
+  } catch (e) { alert("Save failed: " + e.message); }
+  state.saving = false; renderSaveState();
+}
+let nextTimer = null;
+function scheduleSaveNext() {
+  if (!state.canWrite) { state.dirty = true; renderSaveState(); return; }
+  state.dirty = true; renderSaveState();
+  clearTimeout(nextTimer);
+  nextTimer = setTimeout(doSaveNext, 400);
+}
+async function doSaveNext() {
+  if (!state.canWrite || state.saving) return;
+  state.saving = true; renderSaveState();
+  try {
+    state.next.updated = today();
+    await saveJSON("next.json", state.next);
     state.dirty = false;
   } catch (e) { alert("Save failed: " + e.message); }
   state.saving = false; renderSaveState();
 }
 
-/* ---------- mutations ---------- */
+/* ---------- mutations: epics ---------- */
 function moveEpic(id, newStatus) {
   const x = findEpic(id);
   if (!x || x.archived) return;
   x.epic.status = newStatus;
   scheduleSave(); render();
 }
-function cycleTask(epicId, taskId) {
-  const x = findEpic(epicId); if (!x) return;
-  const t = (x.epic.tasks || []).find((t) => t.id === taskId); if (!t) return;
-  t.status = TASK_CYCLE[t.status] || "todo";
-  scheduleSave(); renderDrawer(); renderBoard();
-}
 function editEpic(id, patch) {
   const x = findEpic(id); if (!x) return;
   Object.assign(x.epic, patch);
-  scheduleSave(); renderBoard(); renderDrawer();
+  scheduleSave(); render();
 }
 function archiveEpic(id) {
   const idx = state.roadmap.phases.findIndex((p) => (p.epics || []).some((e) => e.id === id));
@@ -331,7 +588,7 @@ function archiveEpic(id) {
   const [epic] = p.epics.splice(i, 1);
   epic.status = "done";
   epic.phase = epic.phase || p.id;
-  epic.shipped = epic.shipped || new Date().toISOString().slice(0, 10);
+  epic.shipped = epic.shipped || today();
   state.archive.epics = state.archive.epics || [];
   state.archive.epics.unshift(epic);
   state.openEpicId = null;
@@ -348,76 +605,235 @@ function restoreEpic(id) {
   scheduleSave(); render();
 }
 
+/* ---------- mutations: tasks ---------- */
+function nextTaskId(epic) {
+  let max = 0;
+  for (const t of epic.tasks || []) { const m = /-T(\d+)$/.exec(t.id || ""); if (m) max = Math.max(max, +m[1]); }
+  return `${epic.id}-T${max + 1}`;
+}
+function cycleTask(epicId, taskId) {
+  const x = findEpic(epicId); if (!x) return;
+  const t = (x.epic.tasks || []).find((t) => t.id === taskId); if (!t) return;
+  t.status = TASK_CYCLE[t.status] || "todo";
+  scheduleSave(); renderDrawer(); refreshContent();
+}
+function addTask(epicId) {
+  const x = findEpic(epicId); if (!x) return;
+  x.epic.tasks = x.epic.tasks || [];
+  x.epic.tasks.push({ id: nextTaskId(x.epic), title: "New task", status: "todo" });
+  scheduleSave(); renderDrawer(); refreshContent();
+}
+function renameTask(epicId, taskId, title) {
+  const x = findEpic(epicId); const t = x && (x.epic.tasks || []).find((t) => t.id === taskId);
+  if (!t) return;
+  t.title = title;
+  scheduleSave(); refreshContent();
+}
+function deleteTask(epicId, taskId) {
+  const x = findEpic(epicId); if (!x) return;
+  x.epic.tasks = (x.epic.tasks || []).filter((t) => t.id !== taskId);
+  scheduleSave(); renderDrawer(); refreshContent();
+}
+function moveTask(epicId, taskId, dir) {
+  const x = findEpic(epicId); const arr = x && x.epic.tasks; if (!arr) return;
+  const i = arr.findIndex((t) => t.id === taskId); const j = i + dir;
+  if (i < 0 || j < 0 || j >= arr.length) return;
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  scheduleSave(); renderDrawer();
+}
+
+/* ---------- mutations: up next ---------- */
+function editNext(patch) {
+  state.next = Object.assign(state.next || { updated: "", next: null, note: "", criticalPath: [], risks: [] }, patch);
+  scheduleSaveNext(); renderDrawer(); refreshSidebar();
+}
+
+/* ---------- filters / chrome ---------- */
+function togglePhase(id) {
+  const f = state.filter.phase;
+  f.has(id) ? f.delete(id) : f.add(id);
+  render();
+}
+function toggleSidebar() {
+  if (window.matchMedia("(max-width: 860px)").matches) { state.sidebarOpen = !state.sidebarOpen; }
+  else { state.sidebarCollapsed = !state.sidebarCollapsed; localStorage.setItem(SIDEBAR_KEY, state.sidebarCollapsed ? "1" : "0"); }
+  // Toggle classes on the live element so the width transition animates.
+  // A full re-render would recreate the node already in its final state (no animation).
+  const shell = document.querySelector(".shell");
+  if (!shell) { render(); return; }
+  shell.classList.toggle("side-collapsed", state.sidebarCollapsed);
+  shell.classList.toggle("side-open", state.sidebarOpen);
+}
+function setTheme(mode) {
+  state.themeMode = mode;
+  localStorage.setItem(THEME_KEY, mode);
+  document.documentElement.dataset.theme = mode;
+  render();
+}
+// ---- label vocabulary management (board.tokens.json) ----
+function openLabelManager() { state.labelManagerOpen = true; state.openEpicId = null; state.nextEditorOpen = false; render(); }
+function allEpicArrays() {
+  const eps = [];
+  for (const p of state.roadmap?.phases || []) for (const e of p.epics || []) eps.push(e);
+  for (const e of state.archive?.epics || []) eps.push(e);
+  return eps;
+}
+// Apply fn to every epic's and task's labels array (deduped), for rename/remove propagation.
+function mapLabels(fn) {
+  for (const e of allEpicArrays()) {
+    if (Array.isArray(e.labels)) e.labels = [...new Set(fn(e.labels))];
+    for (const t of e.tasks || []) if (Array.isArray(t.labels)) t.labels = [...new Set(fn(t.labels))];
+  }
+}
+async function persistLabels(touchEpics) {
+  state.saving = true; renderSaveState();
+  try {
+    await saveJSON("board.tokens.json", state.tokens);
+    if (touchEpics) { await saveJSON("roadmap.json", state.roadmap); await saveJSON("archive.json", state.archive); }
+    state.dirty = false;
+  } catch (e) { alert("Save failed: " + e.message); }
+  state.saving = false; render();
+}
+function ensureLabels() { state.tokens = state.tokens || {}; state.tokens.labels = state.tokens.labels || {}; return state.tokens.labels; }
+function setLabelEmoji(name, emoji) { ensureLabels()[name] = (emoji || "").trim(); persistLabels(false); }
+function addLabelEntry(name, emoji) { ensureLabels()[name.trim()] = (emoji || "").trim(); persistLabels(false); }
+function renameLabel(oldName, raw) {
+  const nv = (raw || "").trim();
+  if (!nv || nv === oldName) { render(); return; }
+  const labels = ensureLabels();
+  labels[nv] = labels[oldName] || "";
+  delete labels[oldName];
+  mapLabels((ls) => ls.map((l) => (l === oldName ? nv : l)));
+  if (state.filter.label.has(oldName)) { state.filter.label.delete(oldName); state.filter.label.add(nv); }
+  persistLabels(true);
+}
+function removeLabel(name) {
+  delete ensureLabels()[name];
+  mapLabels((ls) => ls.filter((l) => l !== name));
+  state.filter.label.delete(name);
+  persistLabels(true);
+}
+
 /* ============================================================
    RENDER
    ============================================================ */
+// Inject token overrides as a <style> scoped per mode, so the data-theme switch
+// (and the built-in dark palette) keep working. Inline vars would override both.
 function applyTheme() {
-  const t = state.tokens?.theme || {};
   const map = { "bg-canvas": "--bg-canvas", "bg-surface": "--bg-surface", "bg-sunken": "--bg-sunken", "brand": "--brand", "brand-hover": "--brand-hover", "brand-subtle": "--brand-subtle", "accent": "--accent", "text-primary": "--text-primary", "text-secondary": "--text-secondary", "border": "--border", "warning": "--warning", "danger": "--danger", "success": "--success" };
-  for (const [k, v] of Object.entries(map)) if (t[k]) document.documentElement.style.setProperty(v, t[k]);
+  const block = (sel, theme) => {
+    if (!theme) return "";
+    const decls = Object.entries(map).map(([k, v]) => theme[k] ? `${v}:${theme[k]};` : "").join("");
+    return decls ? `${sel}{${decls}}` : "";
+  };
+  let style = document.getElementById("token-theme");
+  if (!style) { style = document.createElement("style"); style.id = "token-theme"; document.head.appendChild(style); }
+  style.textContent = block(':root[data-theme="light"]', state.tokens?.theme) + block(':root[data-theme="dark"]', state.tokens?.themeDark);
+  document.documentElement.dataset.theme = state.themeMode;
 }
 
 function render() { applyTheme(); renderApp(); }
-
 function renderApp() {
   const app = $("#app");
   app.innerHTML = "";
-  app.append(renderHeader());
-  if (state.legendOpen) app.append(renderLegend());
-  if (state.next) app.append(renderNext());
-  app.append(renderBoardEl());
+  app.append(renderShell());
   app.append(renderDrawerEl());
   renderSaveState();
 }
+function refresh(id, node) { const old = $("#" + id); if (old) old.replaceWith(node); else render(); }
+function refreshContent() { refresh("content", renderContent()); }
+function refreshSidebar() { refresh("sidebar", renderSidebar()); }
 
 function chip(text, cls = "") { return el("span", { class: "chip " + cls }, text); }
 
-function renderHeader() {
+function renderShell() {
+  return el("div", { class: "shell" + (state.sidebarOpen ? " side-open" : "") + (state.sidebarCollapsed ? " side-collapsed" : "") },
+    renderSidebar(),
+    el("div", { class: "main" }, renderTopbar(), renderStepper(), renderFilterBar(), renderContent()),
+    el("div", { class: "side-scrim", onclick: () => { state.sidebarOpen = false; const sh = document.querySelector(".shell"); sh ? sh.classList.remove("side-open") : render(); } }),
+  );
+}
+
+/* ---------- sidebar ---------- */
+function renderBrand() {
+  const d = new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  return el("div", { class: "topbar-brand" },
+    el("span", { class: "brand-mark" }, "ak"),
+    el("div", {},
+      el("div", { class: "title" }, state.roadmap?.project || "agentkan"),
+      el("div", { class: "greeting" }, d + " · " + state.greeting)));
+}
+
+function renderSidebar() {
+  const inner = el("div", { class: "sidebar-inner" });
+
+  inner.append(el("div", { class: "seg" },
+    el("button", { class: state.view === "board" ? "on" : "", onclick: () => { state.view = "board"; render(); } }, "▦ Board"),
+    el("button", { class: state.view === "timeline" ? "on" : "", onclick: () => { state.view = "timeline"; render(); } }, "▭ Timeline")));
+
+  inner.append(renderSideNext());
+
+  inner.append(el("div", { class: "side-sec" },
+    el("button", { class: "pill" + (state.showArchived ? " on" : ""), onclick: () => { state.showArchived = !state.showArchived; render(); } }, "🗄️ Archived"),
+    el("button", { class: "pill" + (state.legendOpen ? " on" : ""), onclick: () => { state.legendOpen = !state.legendOpen; render(); } }, "ℹ️ Legend")));
+  if (state.legendOpen) inner.append(renderLegend());
+
+  return el("div", { class: "sidebar", id: "sidebar" }, inner);
+}
+
+function renderSideNext() {
+  const n = state.next;
+  const sec = el("div", { class: "side-sec" });
+  sec.append(el("div", { class: "side-h-row" },
+    el("span", { class: "side-h" }, "Up next"),
+    state.canWrite ? el("button", { class: "linkbtn", onclick: openNextEditor }, "Edit") : null));
+  if (!n) { sec.append(el("div", { class: "muted" }, "No next.json")); return sec; }
+
+  const r = resolveNext(n.next);
+  const am = r && r.assignee ? assigneeMeta(r.assignee) : null;
+  sec.append(el("div", { class: "side-now" + (r && r.epic ? " clickable" : ""), onclick: () => { if (r && r.epic) openDrawer(r.epic.id); } },
+    el("div", { class: "now-title" }, r ? r.title : "Nothing queued"),
+    r && r.epic ? el("div", { class: "now-meta" }, el("span", {}, "in " + r.epic.id), am ? chip(am.emoji + " " + am.label, "assignee") : null) : null,
+    n.note ? el("div", { class: "now-note" }, n.note) : null,
+  ));
+  if (n.criticalPath?.length) sec.append(el("div", { class: "side-mini" },
+    el("div", { class: "side-h" }, "🧑 Critical path"),
+    el("ul", {}, n.criticalPath.map((c) => el("li", {}, (typeof c === "string" ? c : c.title) + (c && c.unblocks ? ` → ${c.unblocks}` : ""))))));
+  if (n.risks?.length) sec.append(el("div", { class: "side-mini" },
+    el("div", { class: "side-h" }, "⚠️ Risks / watch"),
+    el("ul", {}, n.risks.map((c) => el("li", {}, c)))));
+  return sec;
+}
+
+// Filter bar in the main column: Who (assignees) + Labels under it.
+function renderFilterBar() {
   const f = state.filter;
   const assignees = state.tokens?.assignees || {};
-  const labels = state.tokens?.labels || {};
+  const bar = el("div", { class: "filterbar" });
 
-  const assigneeChips = Object.keys(assignees).map((a) =>
-    el("button", { class: "pill" + (f.assignee.has(a) ? " on" : ""), title: "Filter: " + assignees[a].label,
-      onclick: () => { f.assignee.has(a) ? f.assignee.delete(a) : f.assignee.add(a); render(); } },
-      assignees[a].emoji + " " + assignees[a].label));
+  bar.append(el("div", { class: "fb-row" },
+    el("span", { class: "fb-h" }, "Assignee"),
+    ...Object.keys(assignees).map((a) =>
+      el("button", { class: "pill" + (f.assignee.has(a) ? " on" : ""), onclick: () => { f.assignee.has(a) ? f.assignee.delete(a) : f.assignee.add(a); render(); } },
+        assignees[a].emoji + " " + assignees[a].label))));
 
-  const labelChips = Object.keys(labels).map((l) =>
-    el("button", { class: "pill ghost" + (f.label.has(l) ? " on" : ""),
-      onclick: () => { f.label.has(l) ? f.label.delete(l) : f.label.add(l); render(); } },
-      labels[l] + " " + l));
+  const lks = labelKeys();
+  bar.append(el("div", { class: "fb-row" },
+    el("span", { class: "fb-h" }, "Labels"),
+    ...lks.map((l) =>
+      el("button", { class: "pill ghost" + (f.label.has(l) ? " on" : ""), onclick: () => { f.label.has(l) ? f.label.delete(l) : f.label.add(l); render(); } },
+        (labelEmoji(l) ? labelEmoji(l) + " " : "") + l)),
+    state.canWrite ? el("button", { class: "pill add", title: "Add or edit labels", onclick: openLabelManager }, "+") : null));
 
-  const editBtn = state.canWrite
-    ? el("span", { class: "save-state", id: "save-state" })
-    : el("button", { class: "btn primary", onclick: enableEditing }, "Enable editing");
-
-  return el("header", {},
-    el("div", { class: "h-row" },
-      el("span", { class: "title" }, (state.roadmap?.project || "Board")),
-      el("span", { class: "updated" }, state.roadmap?.updated ? "updated " + state.roadmap.updated : ""),
-      el("span", { class: "spacer" }),
-      el("input", { class: "search", placeholder: "Search…", value: f.q,
-        oninput: (e) => { f.q = e.target.value; renderBoard(); } }),
-      el("button", { class: "pill" + (state.showArchived ? " on" : ""),
-        onclick: () => { state.showArchived = !state.showArchived; render(); } }, "🗄️ Archived"),
-      el("button", { class: "pill", onclick: () => { state.legendOpen = !state.legendOpen; render(); } }, "ℹ️ Legend"),
-      el("button", { class: "btn", onclick: reload }, "↻"),
-      editBtn,
-    ),
-    el("div", { class: "filters" },
-      el("span", { class: "lbl" }, "Who"), ...assigneeChips,
-      el("span", { class: "lbl", style: "margin-left:10px" }, "Labels"), ...labelChips,
-      (f.assignee.size || f.label.size || f.q)
-        ? el("button", { class: "pill ghost", onclick: () => { f.assignee.clear(); f.label.clear(); f.q = ""; render(); } }, "✕ clear")
-        : null,
-    ),
-  );
+  if (f.assignee.size || f.label.size || f.phase.size || f.q)
+    bar.append(el("button", { class: "linkbtn", onclick: () => { f.assignee.clear(); f.label.clear(); f.phase.clear(); f.q = ""; render(); } }, "✕ clear filters"));
+  return bar;
 }
 
 function renderLegend() {
   const a = state.tokens?.assignees || {}, s = state.tokens?.statuses || {}, l = state.tokens?.labels || {};
-  const grp = (title, obj, fmt) => el("span", {}, el("b", {}, title + ": "),
-    Object.entries(obj).map(([k, v]) => fmt(k, v)).join("   "));
+  const grp = (title, obj, fmt) => el("div", {}, el("b", {}, title + ": "),
+    Object.entries(obj).map(([k, v]) => fmt(k, v)).join("  "));
   return el("div", { class: "legend" },
     grp("Assignee", a, (k, v) => `${v.emoji} ${v.label}`),
     grp("Status", s, (k, v) => `${v.emoji} ${v.label}`),
@@ -425,38 +841,49 @@ function renderLegend() {
   );
 }
 
-function renderNext() {
-  const n = state.next;
-  const head = el("div", { class: "next-head", onclick: () => { n._open = !n._open; render(); } },
-    el("span", { class: "k" }, "▶ Now"),
-    el("span", {}, n.next ? el("b", {}, n.next) : "—"),
-    n.note ? el("span", { class: "muted" }, "· " + n.note) : null,
-  );
-  const wrap = el("div", { class: "next" }, head);
-  if (n._open) {
-    const body = el("div", { class: "next-body" });
-    if (n.criticalPath?.length) body.append(el("div", { class: "next-card" },
-      el("h4", {}, "🧑 Critical path (human-only)"),
-      el("ul", {}, n.criticalPath.map((c) => el("li", {}, (typeof c === "string" ? c : c.title) + (c.unblocks ? ` → ${c.unblocks}` : ""))))));
-    if (n.revenueBlockers?.length) body.append(el("div", { class: "next-card" },
-      el("h4", {}, "💳 Revenue blockers"),
-      el("ul", {}, n.revenueBlockers.map((c) => el("li", {}, c)))));
-    if (n.fragile?.length) body.append(el("div", { class: "next-card" },
-      el("h4", {}, "⚠️ Fragile / watch"),
-      el("ul", {}, n.fragile.map((c) => el("li", {}, c)))));
-    wrap.append(body);
-  }
+/* ---------- top bar ---------- */
+function renderTopbar() {
+  const items = [];
+  items.push(el("button", { class: "btn", title: "Toggle sidebar", onclick: toggleSidebar }, "☰"));
+  items.push(renderBrand());
+  items.push(el("span", { class: "spacer" }));
+  if (state.view === "board")
+    items.push(el("input", { class: "search", placeholder: "Search…", value: state.filter.q, oninput: (e) => { state.filter.q = e.target.value; refreshContent(); } }));
+  items.push(el("button", { class: "btn", title: state.themeMode === "dark" ? "Switch to light" : "Switch to dark", onclick: () => setTheme(state.themeMode === "dark" ? "light" : "dark") }, state.themeMode === "dark" ? "☀️" : "🌙"));
+  items.push(el("button", { class: "btn", title: "Reload", onclick: reload }, "↻"));
+  items.push(el("span", { class: "save-state", id: "save-state" }));
+  return el("div", { class: "topbar" }, ...items);
+}
+
+/* ---------- phase stepper ---------- */
+function renderStepper() {
+  const wrap = el("div", { class: "stepper", id: "stepper" });
+  const phases = state.roadmap?.phases || [];
+  phases.forEach((p) => {
+    const prog = phaseProgress(p);
+    const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
+    wrap.append(el("div", { class: "step" + (p.status === "active" ? " active" : "") + (state.filter.phase.has(p.id) ? " sel" : ""), onclick: () => togglePhase(p.id) },
+      el("div", { class: "st-top" },
+        el("span", {}, p.emoji || "📦"), el("span", {}, p.title || p.id),
+        p.status === "active" ? el("span", { class: "st-you" }, "you") : null),
+      el("div", { class: "st-prog" }, el("i", { style: `width:${pct}%` })),
+      el("div", { class: "st-meta" }, `${prog.done}/${prog.total} epics · ${p.status}`),
+    ));
+  });
   return wrap;
 }
 
-function renderBoardEl() {
-  const board = el("div", { class: "board", id: "board" });
+/* ---------- content: board | timeline ---------- */
+function renderContent() { return state.view === "timeline" ? renderTimeline() : renderBoardView(); }
+
+function renderBoardView() {
+  const board = el("div", { class: "board", id: "content" });
   STATUS_ORDER.forEach((st) => board.append(renderColumn(st)));
   return board;
 }
 function renderColumn(st) {
   const meta = statusMeta(st);
-  const items = allEpics().filter((x) => x.epic.status === st && passesFilter(x.epic));
+  const items = allEpics().filter((x) => x.epic.status === st && epicMatches(x.epic) && phaseSelected(x.phase.id));
   const col = el("div", { class: "col", "data-status": st,
     ondragover: (e) => { e.preventDefault(); col.classList.add("drop"); },
     ondragleave: () => col.classList.remove("drop"),
@@ -503,79 +930,288 @@ function renderCard(x) {
   return card;
 }
 
+function renderTimeline() {
+  const wrap = el("div", { class: "timeline", id: "content" });
+  const upId = resolveNext(state.next?.next)?.epic?.id;
+  const phases = (state.roadmap?.phases || []).filter((p) => phaseSelected(p.id));
+  if (!phases.length) { wrap.append(el("div", { class: "muted", style: "padding:24px" }, "No phases match the filters.")); return wrap; }
+  phases.forEach((p) => {
+    const eps = (p.epics || []).filter((e) => epicMatches(e)).slice().sort((a, b) => (a.order || 0) - (b.order || 0));
+    const prog = phaseProgress(p);
+    const lane = el("div", { class: "lane" + (p.status === "active" ? " active" : ""), id: "lane-" + p.id });
+    lane.append(el("div", { class: "lane-head" },
+      el("span", {}, p.emoji || "📦"),
+      el("span", { class: "lh-title" }, p.title || p.id),
+      p.status === "active" ? el("span", { class: "lh-you" }, "● you are here") : null,
+      el("span", { class: "lh-prog" }, `${prog.done}/${prog.total} epics done`),
+    ));
+    const row = el("div", { class: "lane-epics" });
+    if (!eps.length) row.append(el("div", { class: "muted" }, "No epics"));
+    eps.forEach((e) => row.append(renderTimelineBar(e, e.id === upId)));
+    lane.append(row);
+    wrap.append(lane);
+  });
+  return wrap;
+}
+function renderTimelineBar(e, isUp) {
+  const tasks = e.tasks || [];
+  const done = tasks.filter((t) => t.status === "done").length;
+  const am = assigneeMeta(e.assignee);
+  const sm = statusMeta(e.status);
+  const bar = el("div", { class: "tbar" + (isUp ? " up" : ""), style: `--st-color:${STATUS_COLOR[e.status] || "var(--border)"}`, onclick: () => openDrawer(e.id) },
+    el("div", { class: "tb-top" }, el("span", { class: "emoji" }, e.emoji || "🧩"), el("span", { class: "eid" }, e.id)),
+    el("div", { class: "tb-title" }, e.title),
+    el("div", { class: "tb-meta" }, chip(am.emoji + " " + am.label, "assignee"), el("span", {}, sm.emoji + " " + sm.label)),
+  );
+  if (tasks.length) {
+    bar.append(el("div", { class: "progress" }, el("i", { style: `width:${Math.round(done / tasks.length * 100)}%` })));
+    bar.append(el("div", { class: "ptext" }, `${done}/${tasks.length} tasks`));
+  }
+  return bar;
+}
+
 /* ---------- drawer ---------- */
 function renderDrawerEl() {
-  const scrim = el("div", { class: "scrim" + (state.openEpicId ? " open" : ""), onclick: closeDrawer });
-  const drawer = el("div", { class: "drawer" + (state.openEpicId ? " open" : ""), id: "drawer" });
+  const open = !!state.openEpicId || state.nextEditorOpen || state.labelManagerOpen;
+  const scrim = el("div", { class: "scrim" + (open ? " open" : ""), onclick: closeDrawer });
+  const drawer = el("div", { class: "drawer" + (open ? " open" : ""), id: "drawer" });
   if (state.openEpicId) drawer.append(...drawerContent(findEpic(state.openEpicId)));
+  else if (state.nextEditorOpen) drawer.append(...nextEditorContent());
+  else if (state.labelManagerOpen) drawer.append(...labelManagerContent());
   return el("div", {}, scrim, drawer);
 }
-function openDrawer(id) { state.openEpicId = id; render(); }
-function closeDrawer() { state.openEpicId = null; render(); }
-function renderDrawer() { const x = findEpic(state.openEpicId); const d = $("#drawer"); if (d && x) { d.innerHTML = ""; d.append(...drawerContent(x)); } }
+function openDrawer(id) {
+  state.openEpicId = id; state.nextEditorOpen = false;
+  state.body = { id, text: null, loading: true, editing: false };
+  render();
+  loadBody(id);
+}
+function openNextEditor() { state.nextEditorOpen = true; state.openEpicId = null; render(); }
+function closeDrawer() { state.openEpicId = null; state.nextEditorOpen = false; state.labelManagerOpen = false; state.body = null; render(); }
+function renderDrawer() {
+  const d = $("#drawer"); if (!d) return;
+  d.innerHTML = "";
+  if (state.openEpicId) { const x = findEpic(state.openEpicId); if (x) d.append(...drawerContent(x)); }
+  else if (state.nextEditorOpen) d.append(...nextEditorContent());
+  else if (state.labelManagerOpen) d.append(...labelManagerContent());
+}
+
+async function loadBody(id) {
+  const x = findEpic(id);
+  const path = x && x.epic.body;
+  if (!path) { state.body = { id, text: null, loading: false, editing: false }; renderDrawer(); return; }
+  try {
+    const r = await fetch("./" + path, { cache: "no-store" });
+    const text = r.ok ? await r.text() : null;
+    if (state.openEpicId === id) { state.body = { id, text, loading: false, editing: false }; renderDrawer(); }
+  } catch {
+    if (state.openEpicId === id) { state.body = { id, text: null, loading: false, editing: false }; renderDrawer(); }
+  }
+}
+
+function renderBodySection(e) {
+  const b = state.body;
+  const wrap = el("div", { class: "field" });
+  const head = el("div", { class: "body-head" }, el("label", { class: "grow" }, "Body" + (e.body ? " · " + e.body : "")));
+  wrap.append(head);
+
+  if (!b || b.loading) { wrap.append(el("div", { class: "muted" }, "Loading…")); return wrap; }
+
+  if (b.editing) {
+    const ta = el("textarea", { class: "body-edit" }, b.text || "");
+    head.append(
+      el("button", { class: "btn", onclick: () => { state.body.editing = false; renderDrawer(); } }, "Cancel"),
+      el("button", { class: "btn primary", onclick: async () => {
+        const md = ta.value;
+        try { await saveBody(e.id, md); state.body = { id: e.id, text: md, loading: false, editing: false }; renderDrawer(); }
+        catch (err) { alert("Save failed: " + err.message); }
+      } }, "Save"));
+    wrap.append(ta);
+    return wrap;
+  }
+
+  if (b.text == null) {
+    wrap.append(el("div", { class: "muted" }, e.body ? "No body file yet." : "This epic has no body."));
+    if (state.canWrite && e.body) head.append(el("button", { class: "btn", onclick: () => { state.body = { id: e.id, text: "", loading: false, editing: true }; renderDrawer(); } }, "Create"));
+    return wrap;
+  }
+
+  if (state.canWrite) head.append(el("button", { class: "btn", onclick: () => { state.body.editing = true; renderDrawer(); } }, "Edit"));
+  wrap.append(el("div", { class: "md", html: mdToHtml(b.text) }));
+  return wrap;
+}
+
+// Labels on an epic: removable chips + a dropdown that picks from the vocabulary.
+function renderLabelPicker(e, ro) {
+  const wrap = el("div", { class: "field" });
+  wrap.append(el("label", {}, "Labels"));
+
+  const current = e.labels || [];
+  const chips = el("div", { class: "chips lbl-chips" });
+  current.forEach((l) => chips.append(el("span", { class: "chip" },
+    (labelEmoji(l) ? labelEmoji(l) + " " : "") + l,
+    ro ? null : el("button", { class: "chip-x", title: "remove", onclick: () => editEpic(e.id, { labels: current.filter((x) => x !== l) }) }, "×"))));
+  if (!current.length) chips.append(el("span", { class: "muted" }, "none"));
+  wrap.append(chips);
+
+  if (!ro) {
+    const avail = labelKeys().filter((l) => !current.includes(l));
+    wrap.append(el("select", { onchange: (ev) => { if (ev.target.value) editEpic(e.id, { labels: [...current, ev.target.value] }); } },
+      el("option", { value: "", selected: true }, "+ Add label…"),
+      ...avail.map((l) => el("option", { value: l }, (labelEmoji(l) ? labelEmoji(l) + " " : "") + l))));
+  }
+  return wrap;
+}
 
 function drawerContent(x) {
   if (!x) return [];
   const e = x.epic;
   const ro = !state.canWrite || x.archived;
-  const am = assigneeMeta(e.assignee);
 
   const head = el("div", { class: "dr-head" },
     el("button", { class: "x", onclick: closeDrawer }, "×"),
-    el("div", { class: "eid" }, e.emoji + " " + e.id + (x.archived ? " · archived" : "")),
+    el("div", { class: "eid" }, (e.emoji ? e.emoji + " " : "") + e.id + (x.archived ? " · archived" : "")),
     el("h2", {}, e.title),
   );
 
   const body = el("div", { class: "dr-body" });
 
-  // editable meta
   const assigneeSel = el("select", { disabled: ro, onchange: (ev) => editEpic(e.id, { assignee: ev.target.value }) },
     ...Object.keys(state.tokens?.assignees || { ai: 1, me: 1, "ai+verify": 1 }).map((a) =>
-      el("option", { value: a, selected: a === e.assignee ? "" : null }, assigneeMeta(a).emoji + " " + assigneeMeta(a).label)));
+      el("option", { value: a, selected: a === e.assignee ? true : null }, assigneeMeta(a).emoji + " " + assigneeMeta(a).label)));
   const statusSel = el("select", { disabled: ro, onchange: (ev) => editEpic(e.id, { status: ev.target.value }) },
-    ...STATUS_ORDER.map((s) => el("option", { value: s, selected: s === e.status ? "" : null }, statusMeta(s).emoji + " " + statusMeta(s).label)));
-  const plannedInp = el("input", { type: "date", value: e.planned || "", disabled: ro,
-    onchange: (ev) => editEpic(e.id, { planned: ev.target.value || null }) });
-  const labelsInp = el("input", { type: "text", value: (e.labels || []).join(", "), disabled: ro, placeholder: "comma,separated",
-    onchange: (ev) => editEpic(e.id, { labels: ev.target.value.split(",").map((s) => s.trim()).filter(Boolean) }) });
+    ...STATUS_ORDER.map((s) => el("option", { value: s, selected: s === e.status ? true : null }, statusMeta(s).emoji + " " + statusMeta(s).label)));
+  const titleInp = el("input", { type: "text", value: e.title, disabled: ro, onchange: (ev) => editEpic(e.id, { title: ev.target.value }) });
+  const plannedInp = el("input", { type: "date", value: e.planned || "", disabled: ro, onchange: (ev) => editEpic(e.id, { planned: ev.target.value || null }) });
 
   body.append(
+    el("div", { class: "field" }, el("label", {}, "Title"), titleInp),
     el("div", { class: "row2" },
       el("div", { class: "field" }, el("label", {}, "Assignee"), assigneeSel),
       el("div", { class: "field" }, el("label", {}, "Status"), statusSel)),
-    el("div", { class: "row2" },
-      el("div", { class: "field" }, el("label", {}, "Planned"), plannedInp),
-      el("div", { class: "field" }, el("label", {}, "Labels"), labelsInp)),
+    el("div", { class: "field" }, el("label", {}, "Planned"), plannedInp),
+    renderLabelPicker(e, ro),
     el("div", { class: "ge" }, el("div", { class: "k" }, "🎯 Goal"), el("div", { class: "v" }, e.goal || "—")),
     el("div", { class: "ge" }, el("div", { class: "k" }, "✅ Exit"), el("div", { class: "v" }, e.exit || "—")),
   );
 
-  if (e.body) body.append(el("div", { class: "muted" }, "📄 Body: ", el("code", {}, e.body),
-    "  ", el("span", { class: "muted" }, "(open in your editor)")));
+  // tasks (add / rename / reorder / delete / toggle)
+  const tasksWrap = el("div", { class: "field" });
+  tasksWrap.append(el("div", { class: "body-head" },
+    el("label", { class: "grow" }, "Tasks"),
+    !ro ? el("button", { class: "btn", onclick: () => addTask(e.id) }, "+ Add") : null));
+  const list = el("div", { class: "tasks" });
+  (e.tasks || []).forEach((t) => {
+    list.append(el("div", { class: "task" + (t.status === "done" ? " done" : "") },
+      el("button", { class: "st", title: "cycle status", disabled: ro, onclick: () => cycleTask(e.id, t.id) },
+        t.status === "done" ? "☑️" : t.status === "doing" ? "🔨" : "⬜"),
+      el("span", { class: "tk" }, t.id.split("-").pop()),
+      ro ? el("span", { class: "tt" }, t.title)
+        : el("input", { class: "tt-edit", value: t.title, onchange: (ev) => renameTask(e.id, t.id, ev.target.value) }),
+      t.assignee ? el("span", { class: "muted" }, assigneeMeta(t.assignee).emoji) : null,
+      !ro ? el("span", { class: "task-actions" },
+        el("button", { class: "ti", title: "move up", onclick: () => moveTask(e.id, t.id, -1) }, "↑"),
+        el("button", { class: "ti", title: "move down", onclick: () => moveTask(e.id, t.id, 1) }, "↓"),
+        el("button", { class: "ti", title: "delete", onclick: () => { if (confirm("Delete " + t.id + "?")) deleteTask(e.id, t.id); } }, "×")) : null,
+    ));
+  });
+  if (!(e.tasks || []).length) list.append(el("div", { class: "muted" }, "No tasks yet."));
+  tasksWrap.append(list);
+  body.append(tasksWrap);
 
-  // tasks
-  if ((e.tasks || []).length) {
-    const list = el("div", { class: "tasks" });
-    e.tasks.forEach((t) => {
-      const tm = statusMeta(t.status === "done" ? "done" : t.status === "doing" ? "active" : "backlog");
-      list.append(el("div", { class: "task" + (t.status === "done" ? " done" : "") },
-        el("button", { class: "st", title: "cycle status", disabled: ro, onclick: () => cycleTask(e.id, t.id) },
-          t.status === "done" ? "☑️" : t.status === "doing" ? "🔨" : "⬜"),
-        el("span", { class: "tk" }, t.id.split("-").pop()),
-        el("span", { class: "tt" }, t.title),
-        t.assignee ? el("span", { class: "muted" }, assigneeMeta(t.assignee).emoji) : null,
-      ));
-    });
-    body.append(el("div", { class: "field" }, el("label", {}, "Tasks"), list));
-  }
+  // markdown body (rendered + editable)
+  body.append(renderBodySection(e));
 
   // actions
   const actions = el("div", { class: "dr-actions" });
   if (!x.archived && state.canWrite) actions.append(el("button", { class: "btn danger", onclick: () => { if (confirm("Archive " + e.id + "?")) archiveEpic(e.id); } }, "🗄️ Archive"));
   if (x.archived && state.canWrite) actions.append(el("button", { class: "btn", onclick: () => restoreEpic(e.id) }, "↩︎ Restore to board"));
-  if (ro && !x.archived) actions.append(el("span", { class: "muted" }, "Read-only — click ‘Enable editing’ to change."));
+  if (ro && !x.archived) actions.append(el("span", { class: "muted" }, "Read-only — run `agentkan serve` to edit."));
   body.append(actions);
 
+  return [head, body];
+}
+
+/* ---------- up next editor (drawer) ---------- */
+function nextEditorContent() {
+  const n = state.next || (state.next = { updated: "", next: null, note: "", criticalPath: [], risks: [] });
+  const head = el("div", { class: "dr-head" },
+    el("button", { class: "x", onclick: closeDrawer }, "×"),
+    el("div", { class: "eid" }, "next.json"),
+    el("h2", {}, "Up next"));
+  const body = el("div", { class: "dr-body" });
+
+  const opts = [el("option", { value: "", selected: !n.next ? true : null }, "— none —")];
+  for (const x of allEpics().filter((x) => !x.archived)) {
+    opts.push(el("option", { value: x.epic.id, selected: n.next === x.epic.id ? true : null }, `${x.epic.id} · ${x.epic.title}`));
+    for (const t of x.epic.tasks || [])
+      opts.push(el("option", { value: t.id, selected: n.next === t.id ? true : null }, ` ${t.id} · ${t.title}`));
+  }
+  body.append(
+    el("div", { class: "field" }, el("label", {}, "Next action"),
+      el("select", { onchange: (ev) => editNext({ next: ev.target.value || null }) }, ...opts)),
+    el("div", { class: "field" }, el("label", {}, "Note"),
+      el("input", { type: "text", value: n.note || "", placeholder: "One line of context", onchange: (ev) => editNext({ note: ev.target.value }) })),
+  );
+
+  // critical path
+  const cp = el("div", { class: "field" });
+  cp.append(el("div", { class: "body-head" }, el("label", { class: "grow" }, "Critical path · you"),
+    el("button", { class: "btn", onclick: () => { n.criticalPath = n.criticalPath || []; n.criticalPath.push({ title: "", assignee: "me", status: "todo", unblocks: "" }); editNext({}); } }, "+ Add")));
+  (n.criticalPath || []).forEach((raw, i) => {
+    const c = typeof raw === "string" ? { title: raw } : raw;
+    cp.append(el("div", { class: "cp-item" },
+      el("input", { type: "text", value: c.title || "", placeholder: "What needs doing", onchange: (ev) => { n.criticalPath[i] = Object.assign({}, c, { title: ev.target.value }); editNext({}); } }),
+      el("div", { class: "row2" },
+        el("input", { type: "text", value: c.unblocks || "", placeholder: "unblocks (e.g. E1.3)", onchange: (ev) => { n.criticalPath[i] = Object.assign({}, c, { unblocks: ev.target.value }); editNext({}); } }),
+        el("button", { class: "btn danger", onclick: () => { n.criticalPath.splice(i, 1); editNext({}); } }, "Remove")),
+    ));
+  });
+  body.append(cp);
+
+  // risks
+  const rk = el("div", { class: "field" });
+  rk.append(el("div", { class: "body-head" }, el("label", { class: "grow" }, "Risks / watch"),
+    el("button", { class: "btn", onclick: () => { n.risks = n.risks || []; n.risks.push(""); editNext({}); } }, "+ Add")));
+  (n.risks || []).forEach((rr, i) => {
+    rk.append(el("div", { class: "row2", style: "margin-top:8px" },
+      el("input", { type: "text", value: rr, placeholder: "Risk / watch item", onchange: (ev) => { n.risks[i] = ev.target.value; editNext({}); } }),
+      el("button", { class: "btn danger", onclick: () => { n.risks.splice(i, 1); editNext({}); } }, "Remove")));
+  });
+  body.append(rk);
+
+  return [head, body];
+}
+
+/* ---------- label manager (drawer) ---------- */
+function labelManagerContent() {
+  const labels = ensureLabels();
+  const head = el("div", { class: "dr-head" },
+    el("button", { class: "x", onclick: closeDrawer }, "×"),
+    el("div", { class: "eid" }, "board.tokens.json"),
+    el("h2", {}, "Manage labels"));
+  const body = el("div", { class: "dr-body" });
+
+  const list = el("div", { class: "field" });
+  list.append(el("label", {}, "Labels"));
+  const entries = Object.entries(labels);
+  if (!entries.length) list.append(el("div", { class: "muted" }, "No labels yet — add one below."));
+  entries.forEach(([name, emoji]) => {
+    list.append(el("div", { class: "lm-row" },
+      el("input", { class: "lm-emoji", value: emoji || "", placeholder: "🙂", maxlength: "4", title: "Emoji", onchange: (ev) => setLabelEmoji(name, ev.target.value) }),
+      el("input", { value: name, title: "Label name", onchange: (ev) => renameLabel(name, ev.target.value) }),
+      el("button", { class: "btn danger", title: "Delete label", onclick: () => { if (confirm(`Delete label “${name}”? It will be removed from every epic and task.`)) removeLabel(name); } }, "×")));
+  });
+  body.append(list);
+
+  const newEmoji = el("input", { class: "lm-emoji", placeholder: "🙂", maxlength: "4", title: "Emoji" });
+  const newName = el("input", { placeholder: "new label name", title: "Label name" });
+  const add = () => { const n = newName.value.trim(); if (n) addLabelEntry(n, newEmoji.value); };
+  body.append(el("div", { class: "field" },
+    el("label", {}, "Add label"),
+    el("div", { class: "lm-row" }, newEmoji, newName, el("button", { class: "btn primary", onclick: add }, "Add"))));
+
+  body.append(el("div", { class: "muted" }, "Renaming or deleting a label updates every epic and task that uses it."));
   return [head, body];
 }
 
@@ -593,59 +1229,23 @@ function renderSaveState() {
   node.append(el("span", { class: "dot " + dot }), txt);
 }
 
-/* ---------- connect / reload ---------- */
-async function enableEditing() {
-  if (!window.showDirectoryPicker) {
-    alert("This browser can't edit files directly. Use Chrome or Edge, or edit the JSON in your editor.");
-    return;
-  }
-  try {
-    let handle = await idb.get("dir");
-    if (handle) {
-      const perm = await handle.queryPermission({ mode: "readwrite" });
-      if (perm !== "granted") {
-        const req = await handle.requestPermission({ mode: "readwrite" });
-        if (req !== "granted") handle = null;
-      }
-    }
-    if (!handle) {
-      handle = await window.showDirectoryPicker({ mode: "readwrite" });
-      await idb.set("dir", handle);
-    }
-    state.dirHandle = handle; state.canWrite = true;
-    await loadFromDir();
-    render();
-  } catch (e) { if (e.name !== "AbortError") alert("Couldn't connect folder: " + e.message); }
-}
-async function reload() {
-  if (state.canWrite) await loadFromDir(); else await loadReadOnly();
-  render();
-}
+/* ---------- reload ---------- */
+async function reload() { await load(); render(); }
 
 /* ---------- boot ---------- */
 async function boot() {
-  await idb.open();
   try {
-    await loadReadOnly();
+    await load();
   } catch (e) {
     $("#app").innerHTML = "";
     $("#app").append(el("div", { class: "welcome" },
       el("h1", {}, "agentkan board"),
       el("p", {}, "Couldn't load the board files. Serve this folder with:"),
       el("p", {}, el("code", {}, "npx agentkan serve")),
-      el("p", { class: "muted" }, "Or open the folder directly:"),
-      el("p", {}, el("button", { class: "btn primary", onclick: enableEditing }, "Open board folder")),
+      el("p", { class: "muted" }, "That serves the board read-write on localhost. Opening this file directly works too, but is read-only."),
     ));
     return;
   }
-  // try to silently restore a previously granted folder for write
-  if (window.showDirectoryPicker) {
-    const handle = await idb.get("dir");
-    if (handle && (await handle.queryPermission({ mode: "readwrite" })) === "granted") {
-      state.dirHandle = handle; state.canWrite = true; await loadFromDir();
-    }
-  }
-  if (state.next && state.next._open === undefined) state.next._open = true;
   render();
 }
 boot();
