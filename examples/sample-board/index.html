@@ -471,6 +471,18 @@ function allEpics() {
 }
 function findEpic(id) { return allEpics().find((x) => x.epic.id === id) || null; }
 
+// Sort E<phase>.<n> ids numerically (E1.2 before E1.10).
+function compareEpicId(a, b) {
+  const pa = /^E(\d+)\.(\d+)$/.exec(a || "");
+  const pb = /^E(\d+)\.(\d+)$/.exec(b || "");
+  if (pa && pb) {
+    const d = Number(pa[1]) - Number(pb[1]);
+    if (d) return d;
+    return Number(pa[2]) - Number(pb[2]);
+  }
+  return String(a || "").localeCompare(String(b || ""), undefined, { numeric: true });
+}
+
 // All labels actually present on the board, so new free-form labels surface as filters.
 function usedLabels() {
   const s = new Set();
@@ -894,7 +906,7 @@ function renderColumn(st) {
     el("span", {}, meta.emoji), el("span", { class: "nm" }, meta.label),
     el("span", { class: "ct" }, String(items.length))));
   const list = el("div", { class: "col-list" });
-  items.sort((a, b) => (a.epic.order || 0) - (b.epic.order || 0));
+  items.sort((a, b) => compareEpicId(a.epic.id, b.epic.id));
   items.forEach((x) => list.append(renderCard(x)));
   col.append(list);
   return col;
@@ -937,7 +949,7 @@ function renderTimeline() {
   const phases = (state.roadmap?.phases || []).filter((p) => phaseSelected(p.id));
   if (!phases.length) { wrap.append(el("div", { class: "muted", style: "padding:24px" }, "No phases match the filters.")); return wrap; }
   phases.forEach((p) => {
-    const eps = (p.epics || []).filter((e) => epicMatches(e)).slice().sort((a, b) => (a.order || 0) - (b.order || 0));
+    const eps = (p.epics || []).filter((e) => epicMatches(e)).slice().sort((a, b) => compareEpicId(a.id, b.id));
     const prog = phaseProgress(p);
     const lane = el("div", { class: "lane" + (p.status === "active" ? " active" : ""), id: "lane-" + p.id });
     lane.append(el("div", { class: "lane-head" },
