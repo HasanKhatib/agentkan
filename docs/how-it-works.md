@@ -6,14 +6,14 @@ Practical guide for using agentkan day to day. Install and CLI flags: [getting s
 
 | File | Owns |
 |------|------|
-| `roadmap.json` | State: phases, epics, tasks, columns, order |
+| `roadmap.json` | State: phases, epics, tasks, status columns |
 | `epics/<ID>.md` | Prose: context, reasoning, how (agents read this) |
 | `next.json` | Pointer: single next action, critical path, blockers |
 | `archive.json` | Finished epics off the live board |
 | `board.tokens.json` | Theme colors and emoji vocabulary for labels/assignees/statuses |
 | `index.html` | Viewer: drag, edit meta, toggle tasks, archive |
 
-JSON is source of truth for **status**. Markdown is source of truth for **how**. There is no `roadmap.md`.
+JSON is source of truth for **status**. Markdown is source of truth for **how**. Epics sort by **id** in the viewer. There is no `roadmap.md`.
 
 ## Three surfaces
 
@@ -152,6 +152,7 @@ Agents must not mark an epic `done` or archive unless you ask in that turn. That
 | New task | `roadmap.json` | no | toggle only |
 | New phase | `roadmap.json` | no | no |
 | Epic status / column | `roadmap.json` | — | drag + drawer |
+| Epic display order | viewer | — | by epic id within column/lane |
 | Archive | `archive.json` | — | drawer |
 | Next action pointer | `next.json` | — | read-only banner |
 | Assignee/status enums | schema + validator | fixed: `ai`, `me`, `ai+verify` | dropdown from tokens |

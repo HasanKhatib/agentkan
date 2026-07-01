@@ -36,8 +36,9 @@ already owns the board directory you launched it from.
 ## The two views
 
 - **Board** — kanban columns by epic status. Drag a card between columns to change
-  its status (Backlog → Next → Active; drop in Blocked when stuck).
-- **Timeline** — the roadmap: each phase is a lane holding its epics in `order`,
+  its status (Backlog → Next → Active; drop in Blocked when stuck). Within each
+  column, epics sort by id (`E1.1`, `E1.2`, `E1.10`, …).
+- **Timeline** — the roadmap: each phase is a lane holding its epics sorted by id,
   colored by status. The active phase is flagged "you are here" and the Up-next
   epic is highlighted. Click any epic to open its drawer.
 

@@ -76,6 +76,10 @@ mkdir -p .cursor/skills && cp -r SKILLS/agentkan .cursor/skills/agentkan
 - The agent **may** add epics/tasks (as `backlog`), advance its own work (`backlog → next → active`), set tasks `todo → doing → done`, mark `blocked`, and fill `goal`, `exit`, `labels`, `planned`, and bodies.
 - The agent **must not** mark an epic `done`, archive, delete, or reorder the board wholesale unless you ask in that turn. Closing and archiving are yours, done by dragging the card in the viewer.
 
+### Epic display order
+
+The viewer sorts epics by **id** within each column and timeline lane (`E1.1` before `E1.10`). Priority is status columns and `next.json`, not the optional legacy `order` field in JSON.
+
 ### Interview flow
 
 When you say "add an epic" or "fill epic E1.2", the agent:

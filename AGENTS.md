@@ -10,7 +10,7 @@ A local-first epic/task roadmap board for building with AI agents: hybrid JSON s
 ## Design principles
 - Hybrid by design: one-line `goal`/`exit` live inline in `roadmap.json`; longer prose lives in `epics/<ID>.md`. Don't collapse to pure JSON or pure markdown.
 - The viewer is one zero-dependency `index.html`. No frameworks, no build step, no new runtime deps.
-- Git is the history. Stable IDs and explicit `order` integers keep diffs small; archive by status move, don't delete.
+- Git is the history. Stable epic ids and status columns keep diffs small; archive by status move, don't delete.
 - One source of truth per topic. When two files need the same content, one imports the other.
 
 ## Always

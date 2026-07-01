@@ -53,7 +53,7 @@ Optional: `bash scripts/validate-board.sh <board-dir>` or `bash scripts/status.s
 
 - **AI proposes, human disposes:** never mark an epic `done`, archive, delete, or reorder wholesale unless the user explicitly asks in this turn. Closing and archiving are human actions in the viewer.
 - Never regex-patch JSON. Read the whole file, mutate the object, write 2-space indent and a trailing newline.
-- IDs are stable forever. Reorder with `order` only. Epic IDs: `E<phase>.<n>`. Task IDs: `<EPIC>-T<n>`.
+- IDs are stable forever. Epic IDs: `E<phase>.<n>`. Task IDs: `<EPIC>-T<n>`. The viewer sorts epics by id; change priority via status columns or `next.json`, not by renumbering ids.
 - `goal` and `exit` are one line each in JSON. Longer context belongs in the epic body.
 - Labels are free-form. Add emoji vocabulary in `board.tokens.json` when a label is here to stay.
 - After any board edit, validate before handing back.

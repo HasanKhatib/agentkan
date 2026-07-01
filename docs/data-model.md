@@ -36,7 +36,7 @@ JSON Schema can't express (unique IDs, task-belongs-to-epic, known labels).
   "assignee": "ai+verify",            // ai | me | ai+verify
   "labels": ["frontend", "design"],   // free-form; tokens only add an emoji
   "planned": "2026-06-25",            // YYYY-MM-DD or null
-  "order": 2,                          // integer; controls position in a column
+  "order": 2,                          // optional legacy integer; viewer sorts by id instead
   "goal": "One line: what done looks like.",
   "exit": "One AI-verifiable line, phrased as observable behavior.",
   "body": "epics/E1.2.md",            // optional pointer to the long-form body
@@ -94,10 +94,17 @@ is needed to re-skin a board. **Labels are free-form** — any string is valid a
 `validate` never rejects one. The `labels` map here only assigns an emoji to the
 common ones; unknown labels render without an emoji and still appear as filters.
 
+## Display order
+
+Within each kanban column and each timeline lane, the viewer sorts epics by **id**
+(`E1.1`, `E1.2`, `E1.10`, …) numerically. Dragging changes **status** (which
+column), not sort position. To signal priority, move cards to Next/Active or point
+`next.json` at the epic or task.
+
 ## Design rules worth keeping
 
-- **IDs are forever.** Reordering changes `order`, never the id. That keeps git
-  diffs small and cross-references (`unblocks`, task ids) stable.
+- **IDs are forever.** Never renumber epics to reshuffle the board. Stable ids
+  keep git diffs small and cross-references (`unblocks`, task ids) valid.
 - **`goal`/`exit` are one line each.** If you need a paragraph, it belongs in the
   markdown body, which expands on — and never contradicts — the JSON.
 - **One source of truth per fact.** State lives in JSON; the "how" lives in the
