@@ -1,6 +1,6 @@
 // Smoke test: init -> validate -> epic new -> validate, in a temp dir.
 // No deps; run with `node test/smoke.mjs` (or `npm test`).
-import { mkdtemp, rm, readFile, access } from "node:fs/promises";
+import { mkdtemp, rm, readFile, access, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -40,11 +40,31 @@ try {
   r = run(["validate"], tmp);
   ok(r.status === 0, "validate still passes after epic new");
 
+  // 4b. releases + epic new --release
+  const withReleases = JSON.parse(await readFile(path.join(board, "roadmap.json"), "utf8"));
+  withReleases.releases = [{ id: "v1", title: "Version 1", status: "active" }];
+  withReleases.phases[0].release = "v1";
+  await writeFile(path.join(board, "roadmap.json"), JSON.stringify(withReleases, null, 2) + "\n");
+  r = run(["epic", "new", "Release tagged epic", "--release", "v1"], tmp);
+  ok(r.status === 0, "epic new --release exits 0");
+  const afterRelease = JSON.parse(await readFile(path.join(board, "roadmap.json"), "utf8"));
+  const releaseEpic = afterRelease.phases.flatMap((p) => p.epics).find((e) => e.title === "Release tagged epic");
+  ok(releaseEpic?.release === "v1", "epic new --release stamps release on epic");
+  r = run(["validate"], tmp);
+  ok(r.status === 0, "validate passes with releases");
+
+  // 4c. invalid release ref fails
+  const badRelease = JSON.parse(await readFile(path.join(board, "roadmap.json"), "utf8"));
+  badRelease.phases[0].epics[0].release = "v9";
+  await writeFile(path.join(board, "roadmap.json"), JSON.stringify(badRelease, null, 2) + "\n");
+  r = run(["validate"], tmp);
+  ok(r.status === 1, "validate fails on unknown release ref");
+
   // 5. validate catches a bad status
   const bad = JSON.parse(await readFile(path.join(board, "roadmap.json"), "utf8"));
   bad.phases[0].epics[0].status = "nope";
-  const { writeFile } = await import("node:fs/promises");
-  await writeFile(path.join(board, "roadmap.json"), JSON.stringify(bad));
+  bad.phases[0].epics[0].release = "v1";
+  await writeFile(path.join(board, "roadmap.json"), JSON.stringify(bad, null, 2) + "\n");
   r = run(["validate"], tmp);
   ok(r.status === 1, "validate fails on an invalid status");
 

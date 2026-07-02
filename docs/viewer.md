@@ -26,12 +26,14 @@ already owns the board directory you launched it from.
 - **Top bar**: ☰ (sidebar), the current view, search (Board view), the
   light/dark toggle (☀/🌙), reload, and the save chip.
 - **Phase stepper** (both views): one chip per phase with a progress bar; the
-  phase whose `status` is `active` is marked **you**. Click a phase to filter.
-- **Filter bar** (under the stepper): an **Assignee** row and a **Labels** row
-  beneath it; "clear filters" resets everything. The **+** in the Labels row opens
-  a manager to add, rename, re-emoji, or delete labels (saved to
-  `board.tokens.json`; renames and deletes propagate to every epic and task).
-  (Phases filter from the stepper chips.)
+  phase whose `status` is `active` is marked **you**. Click a phase to focus the
+  board on that phase (click again to clear). Single-select only.
+- **Release rail** (when `roadmap.json` has `releases[]`): same pattern as phases,
+  below the stepper. Click to focus on one release; click again to clear.
+- **Filter bar** (under the rails): **Assignee** row only; "clear filters" resets
+  assignee and search. Phases, releases, and labels are structure and context,
+  not filter chips. Manage label vocabulary from the sidebar **Labels** button
+  (write mode) or via `board.tokens.json`.
 
 ## The two views
 
@@ -46,7 +48,7 @@ already owns the board directory you launched it from.
 
 - **Open an epic** (click a card or timeline bar) to edit title, assignee, status,
   and planned date; pick labels from a dropdown (remove with the × on each chip);
-  read goal and exit; and manage tasks — toggle ⬜ → 🔨 → ☑️, rename inline, add,
+  read goal and exit; see release and release-doc link when set; and manage tasks — toggle ⬜ → 🔨 → ☑️, rename inline, add,
   reorder (↑/↓), or delete. The epic's markdown
   body (`epics/<ID>.md`) renders inline; click **Edit** then **Save** to write it
   back — the `.md` file stays on disk for agents and git.
@@ -55,9 +57,10 @@ already owns the board directory you launched it from.
   `next.json`.
 - **Archive** a Done epic from its drawer — it moves to `archive.json` with a
   `shipped` date and leaves the live board. **Restore** brings it back.
-- **Filter** by assignee and label (filter bar) and by phase (stepper chips), or
-  **search** by id/title. **Archived** toggles finished epics into view.
-  **Legend** shows the full emoji vocabulary.
+- **Filter** by assignee (filter bar), focus by phase or release (stepper/rail),
+  or **search** by id/title. **Archived** toggles finished epics into view.
+  **Legend** shows the full emoji vocabulary. **Labels** (write mode) opens the
+  label manager.
 - **Switch light/dark** with the ☀/🌙 toggle. It defaults to your OS appearance
   and remembers your choice; text stays high-contrast in both.
 

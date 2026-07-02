@@ -1,8 +1,8 @@
 # The data model
 
-Three JSON files plus markdown bodies. The JSON Schema is `roadmap.schema.json`
-in the board directory; `agentkan validate` enforces it plus a few rules JSON
-Schema can't express (unique IDs, task-belongs-to-epic, known labels).
+Three JSON files plus markdown bodies. The JSON Schema is
+`assets/roadmap.schema.json`; `agentkan validate` enforces it plus a few rules
+JSON Schema can't express (unique IDs, task-belongs-to-epic, known labels).
 
 ## roadmap.json — the live board
 
@@ -11,12 +11,24 @@ Schema can't express (unique IDs, task-belongs-to-epic, known labels).
   "version": 1,
   "project": "My App",
   "updated": "2026-06-22",
+  "releases": [                         // optional: shippable product scope
+    {
+      "id": "v1",
+      "title": "MVP",
+      "emoji": "🚀",
+      "status": "active",              // planned | active | done
+      "goal": "...",                    // optional
+      "exit": "...",
+      "releaseDoc": "releases/v1.md"    // optional: exit-criteria markdown
+    }
+  ],
   "phases": [
     {
       "id": "P1",
       "title": "MVP",
       "emoji": "🔨",
       "status": "active",            // planned | active | done
+      "release": "v1",               // optional: default release for epics in this phase
       "goal": "...",                  // phase-level, optional
       "exit": "...",
       "epics": [ /* see below */ ]
@@ -24,6 +36,14 @@ Schema can't express (unique IDs, task-belongs-to-epic, known labels).
   ]
 }
 ```
+
+### Release
+
+Optional top-level array. Releases are **shippable product scope** (e.g. `v1`, `v2`).
+Phases are **execution grouping**. Many phases can map to one release via
+`phase.release`; epics can override with `epic.release`.
+
+**Release resolution** (viewer, archive): `epic.release` → else `phase.release` → else none.
 
 ### Epic
 
@@ -36,6 +56,8 @@ Schema can't express (unique IDs, task-belongs-to-epic, known labels).
   "assignee": "ai+verify",            // ai | me | ai+verify
   "labels": ["frontend", "design"],   // free-form; tokens only add an emoji
   "planned": "2026-06-25",            // YYYY-MM-DD or null
+  "release": "v1",                    // optional: release id (inherits phase.release if omitted)
+  "releaseDoc": "releases/v1.md",     // optional: per-epic exit-criteria doc
   "order": 2,                          // optional legacy integer; viewer sorts by id instead
   "goal": "One line: what done looks like.",
   "exit": "One AI-verifiable line, phrased as observable behavior.",
@@ -59,9 +81,9 @@ Schema can't express (unique IDs, task-belongs-to-epic, known labels).
 
 ## archive.json — finished epics
 
-A flat list, same epic shape, each `status: "done"` with a `shipped` date and
-the `phase` it came from. Kept out of the live board so it stays fast; the viewer
-loads it only when you toggle **Archived**.
+A flat list, same epic shape, each `status: "done"` with a `shipped` date,
+the `phase` it came from, and optionally `release`. Kept out of the live board
+so it stays fast; the viewer loads it only when you toggle **Archived**.
 
 ```jsonc
 { "version": 1, "updated": "2026-06-22", "epics": [ /* done epics */ ] }
@@ -74,7 +96,7 @@ Thin by design. Don't re-derive epic lists here; point at them.
 ```jsonc
 {
   "updated": "2026-06-22",
-  "next": "E1.2-T1",                  // the single most important next action
+  "next": "E1.2-T1",                  // task or epic id; the viewer resolves it to a title + epic
   "note": "One line of context.",
   "criticalPath": [                    // human-only, external-clock work
     { "title": "Register domain", "assignee": "me", "status": "todo", "unblocks": "E1.3" }
@@ -92,7 +114,8 @@ The viewer is fully data-driven from this file: map `theme` to your project's
 design tokens and define the emoji for each assignee and status. No code change
 is needed to re-skin a board. **Labels are free-form** — any string is valid and
 `validate` never rejects one. The `labels` map here only assigns an emoji to the
-common ones; unknown labels render without an emoji and still appear as filters.
+common ones; unknown labels render without an emoji. Labels are not in the filter
+bar; they appear on epic cards and in the drawer.
 
 ## Display order
 

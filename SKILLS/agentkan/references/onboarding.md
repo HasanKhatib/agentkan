@@ -6,7 +6,7 @@ For projects that do not have an agentkan board yet.
 
 agentkan is a **local roadmap board** for working with AI agents. Instead of an ever-growing `roadmap.md` or scattered todos, you get:
 
-- `roadmap.json` — phases, epics, tasks, columns (structured, movable)
+- `roadmap.json` — phases, optional releases, epics, tasks, columns (structured, movable)
 - `next.json` — one next action, human critical path, risks
 - `epics/<ID>.md` — prose context agents need
 - `index.html` — drag-and-drop viewer the **human** operates

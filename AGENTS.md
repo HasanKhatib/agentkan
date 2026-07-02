@@ -11,6 +11,7 @@ A local-first epic/task roadmap board for building with AI agents: hybrid JSON s
 - Hybrid by design: one-line `goal`/`exit` live inline in `roadmap.json`; longer prose lives in `epics/<ID>.md`. Don't collapse to pure JSON or pure markdown.
 - The viewer is one zero-dependency `index.html`. No frameworks, no build step, no new runtime deps.
 - Git is the history. Stable epic ids and status columns keep diffs small; archive by status move, don't delete.
+- Phases group execution; optional releases group shippable product scope. Epic ids stay stable across both.
 - One source of truth per topic. When two files need the same content, one imports the other.
 
 ## Always
@@ -23,4 +24,4 @@ A local-first epic/task roadmap board for building with AI agents: hybrid JSON s
 **Start:** read `docs/board/next.json` and skim active epics in `docs/board/roadmap.json`. For deeper context see `docs/getting-started.md` and `docs/origin.md`.
 **Board work:** follow `SKILLS/agentkan/SKILL.md` (this copy is for developing the tool; consumer projects install the skill and merge `SKILLS/agentkan/assets/AGENTS.snippet.md`). Edit JSON safely, run `npm run validate`, never mark an epic `done` or archive unless the user asks in this turn.
 **End (handoff):** set statuses to reality, refresh `docs/board/next.json` (`next`, `criticalPath`, `risks`), bump `updated` dates, run `npm run validate`, summarize changes briefly.
-**New epic stub:** `npx agentkan epic new "<title>" [--phase Pn]`, then fill goal, exit, tasks, and `docs/board/epics/<ID>.md`.
+**New epic stub:** `npx agentkan epic new "<title>" [--phase Pn] [--release v1]`, then fill goal, exit, tasks, and `docs/board/epics/<ID>.md`.

@@ -1,6 +1,6 @@
 # The skill & AI workflow
 
-Day-to-day usage (epic stubs, tasks, phases, labels): [how it works](how-it-works.md).
+Day-to-day usage (epic stubs, tasks, phases, releases, labels): [how it works](how-it-works.md).
 
 agentkan ships an [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) for **consumer projects**: onboard a board, migrate scattered tasks, edit epics safely, and run session handoffs. The skill teaches conventions the CLI cannot enforce: propose vs dispose, safe JSON edits, and routing to the right workflow.
 

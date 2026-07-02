@@ -46,14 +46,15 @@ Rules of thumb:
 
 Default structure for a first migration:
 
-- One phase `P1` (`status: "active"`) with current work
+- Optional `releases[]` when the project thinks in shippable versions (`v1`, `v2`)
+- One phase `P1` (`status: "active"`) with current work, optionally `"release": "v1"`
 - Optional `P2+` (`status: "planned"`) for later themes
-- Epic IDs: `E1.1`, `E1.2`, … in phase P1; `E2.1` in P2
+- Epic IDs: `E1.1`, `E1.2`, … in phase P1; `E2.1` in P2 (stable; not renamed per release)
 
 Use CLI stubs when helpful:
 
 ```bash
-npx agentkan epic new "Billing integration" --assignee ai+verify --labels backend
+npx agentkan epic new "Billing integration" --release v1 --assignee ai+verify --labels backend
 ```
 
 Then fill goal, exit, tasks, and `epics/<ID>.md`.

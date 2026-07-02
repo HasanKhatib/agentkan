@@ -31,7 +31,7 @@ Copy this checklist and track progress:
 
 **Step 1: Epic flow** (add, fill, or refine work)
 
-1. If no stub exists: `npx agentkan epic new "<title>" [--phase Pn] [--assignee ai|me|ai+verify] [--labels a,b]`
+1. If no stub exists: `npx agentkan epic new "<title>" [--phase Pn] [--release v1] [--assignee ai|me|ai+verify] [--labels a,b]`
 2. Interview only what you cannot infer (one batch): goal, exit, steps, assignee, planned date
 3. Write both `roadmap.json` and `epics/<ID>.md` (one-line goal/exit in JSON; detail in markdown)
 4. Validate; show the user the new card; ask if goal/exit are right

@@ -186,6 +186,12 @@
   .step .st-prog > i { display: block; height: 100%; background: var(--brand); }
   .step .st-meta { font-size: 10.5px; color: var(--text-secondary); margin-top: 5px; }
 
+  /* ---------- Release rail ---------- */
+  .release-rail { display: flex; gap: 8px; padding: 8px 24px 10px; overflow-x: auto; border-bottom: 1px solid var(--border); background: var(--bg-canvas); }
+  .release-rail .rr-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); align-self: center; flex: 0 0 auto; margin-right: 4px; }
+  .release-rail .step { min-width: 140px; background: var(--bg-surface); }
+  .chip.release { background: var(--brand-subtle); border-color: var(--border); color: var(--text-primary); }
+
   /* ---------- Filter bar ---------- */
   .filterbar { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: var(--bg-surface); }
   .fb-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
@@ -380,7 +386,8 @@ const state = {
   themeMode: initialTheme(),     // "light" | "dark"
   greeting: GREETINGS[Math.floor(Math.random() * GREETINGS.length)],  // chosen once per load
   showArchived: false,
-  filter: { assignee: new Set(), label: new Set(), phase: new Set(), q: "" },
+  nav: { phase: null, release: null },
+  filter: { assignee: new Set(), q: "" },
   openEpicId: null,
   nextEditorOpen: false,
   labelManagerOpen: false,
@@ -513,15 +520,28 @@ function resolveNext(ref) {
 function epicMatches(e) {
   const f = state.filter;
   if (f.assignee.size && !f.assignee.has(e.assignee)) return false;
-  if (f.label.size && !(e.labels || []).some((l) => f.label.has(l))) return false;
   if (f.q) {
     const hay = (e.id + " " + e.title + " " + (e.labels || []).join(" ")).toLowerCase();
     if (!hay.includes(f.q.toLowerCase())) return false;
   }
   return true;
 }
-function phaseSelected(id) { const f = state.filter.phase; return !f.size || f.has(id); }
+function resolveRelease(x) { return x.epic.release || x.phase?.release || null; }
+function releaseMeta(id) {
+  const r = (state.roadmap?.releases || []).find((rel) => rel.id === id);
+  return r ? { id: r.id, title: r.title, emoji: r.emoji || "🚀", releaseDoc: r.releaseDoc } : { id, title: id, emoji: "🚀", releaseDoc: null };
+}
+function epicVisible(x) {
+  if (!epicMatches(x.epic)) return false;
+  if (state.nav.phase && x.phase.id !== state.nav.phase) return false;
+  if (state.nav.release && resolveRelease(x) !== state.nav.release) return false;
+  return true;
+}
 function phaseProgress(p) { const eps = p.epics || []; return { done: eps.filter((e) => e.status === "done").length, total: eps.length }; }
+function releaseProgress(releaseId) {
+  const eps = allEpics().filter((x) => !x.archived && resolveRelease(x) === releaseId);
+  return { done: eps.filter((x) => x.epic.status === "done").length, total: eps.length };
+}
 
 /* ---------- load ---------- */
 async function readJSON(path) {
@@ -601,6 +621,7 @@ function archiveEpic(id) {
   const [epic] = p.epics.splice(i, 1);
   epic.status = "done";
   epic.phase = epic.phase || p.id;
+  epic.release = epic.release || p.release || null;
   epic.shipped = epic.shipped || today();
   state.archive.epics = state.archive.epics || [];
   state.archive.epics.unshift(epic);
@@ -661,10 +682,13 @@ function editNext(patch) {
   scheduleSaveNext(); renderDrawer(); refreshSidebar();
 }
 
-/* ---------- filters / chrome ---------- */
-function togglePhase(id) {
-  const f = state.filter.phase;
-  f.has(id) ? f.delete(id) : f.add(id);
+/* ---------- nav / filters ---------- */
+function toggleNavPhase(id) {
+  state.nav.phase = state.nav.phase === id ? null : id;
+  render();
+}
+function toggleNavRelease(id) {
+  state.nav.release = state.nav.release === id ? null : id;
   render();
 }
 function toggleSidebar() {
@@ -717,13 +741,11 @@ function renameLabel(oldName, raw) {
   labels[nv] = labels[oldName] || "";
   delete labels[oldName];
   mapLabels((ls) => ls.map((l) => (l === oldName ? nv : l)));
-  if (state.filter.label.has(oldName)) { state.filter.label.delete(oldName); state.filter.label.add(nv); }
   persistLabels(true);
 }
 function removeLabel(name) {
   delete ensureLabels()[name];
   mapLabels((ls) => ls.filter((l) => l !== name));
-  state.filter.label.delete(name);
   persistLabels(true);
 }
 
@@ -762,7 +784,7 @@ function chip(text, cls = "") { return el("span", { class: "chip " + cls }, text
 function renderShell() {
   return el("div", { class: "shell" + (state.sidebarOpen ? " side-open" : "") + (state.sidebarCollapsed ? " side-collapsed" : "") },
     renderSidebar(),
-    el("div", { class: "main" }, renderTopbar(), renderStepper(), renderFilterBar(), renderContent()),
+    el("div", { class: "main" }, renderTopbar(), renderStepper(), renderReleaseRail(), renderFilterBar(), renderContent()),
     el("div", { class: "side-scrim", onclick: () => { state.sidebarOpen = false; const sh = document.querySelector(".shell"); sh ? sh.classList.remove("side-open") : render(); } }),
   );
 }
@@ -788,7 +810,8 @@ function renderSidebar() {
 
   inner.append(el("div", { class: "side-sec" },
     el("button", { class: "pill" + (state.showArchived ? " on" : ""), onclick: () => { state.showArchived = !state.showArchived; render(); } }, "🗄️ Archived"),
-    el("button", { class: "pill" + (state.legendOpen ? " on" : ""), onclick: () => { state.legendOpen = !state.legendOpen; render(); } }, "ℹ️ Legend")));
+    el("button", { class: "pill" + (state.legendOpen ? " on" : ""), onclick: () => { state.legendOpen = !state.legendOpen; render(); } }, "ℹ️ Legend"),
+    state.canWrite ? el("button", { class: "pill", onclick: openLabelManager }, "🏷️ Labels") : null));
   if (state.legendOpen) inner.append(renderLegend());
 
   return el("div", { class: "sidebar", id: "sidebar" }, inner);
@@ -818,7 +841,7 @@ function renderSideNext() {
   return sec;
 }
 
-// Filter bar in the main column: Who (assignees) + Labels under it.
+// Filter bar in the main column: assignee only.
 function renderFilterBar() {
   const f = state.filter;
   const assignees = state.tokens?.assignees || {};
@@ -830,16 +853,8 @@ function renderFilterBar() {
       el("button", { class: "pill" + (f.assignee.has(a) ? " on" : ""), onclick: () => { f.assignee.has(a) ? f.assignee.delete(a) : f.assignee.add(a); render(); } },
         assignees[a].emoji + " " + assignees[a].label))));
 
-  const lks = labelKeys();
-  bar.append(el("div", { class: "fb-row" },
-    el("span", { class: "fb-h" }, "Labels"),
-    ...lks.map((l) =>
-      el("button", { class: "pill ghost" + (f.label.has(l) ? " on" : ""), onclick: () => { f.label.has(l) ? f.label.delete(l) : f.label.add(l); render(); } },
-        (labelEmoji(l) ? labelEmoji(l) + " " : "") + l)),
-    state.canWrite ? el("button", { class: "pill add", title: "Add or edit labels", onclick: openLabelManager }, "+") : null));
-
-  if (f.assignee.size || f.label.size || f.phase.size || f.q)
-    bar.append(el("button", { class: "linkbtn", onclick: () => { f.assignee.clear(); f.label.clear(); f.phase.clear(); f.q = ""; render(); } }, "✕ clear filters"));
+  if (f.assignee.size || f.q)
+    bar.append(el("button", { class: "linkbtn", onclick: () => { f.assignee.clear(); f.q = ""; render(); } }, "✕ clear filters"));
   return bar;
 }
 
@@ -875,12 +890,31 @@ function renderStepper() {
   phases.forEach((p) => {
     const prog = phaseProgress(p);
     const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
-    wrap.append(el("div", { class: "step" + (p.status === "active" ? " active" : "") + (state.filter.phase.has(p.id) ? " sel" : ""), onclick: () => togglePhase(p.id) },
+    wrap.append(el("div", { class: "step" + (p.status === "active" ? " active" : "") + (state.nav.phase === p.id ? " sel" : ""), onclick: () => toggleNavPhase(p.id) },
       el("div", { class: "st-top" },
         el("span", {}, p.emoji || "📦"), el("span", {}, p.title || p.id),
         p.status === "active" ? el("span", { class: "st-you" }, "you") : null),
       el("div", { class: "st-prog" }, el("i", { style: `width:${pct}%` })),
       el("div", { class: "st-meta" }, `${prog.done}/${prog.total} epics · ${p.status}`),
+    ));
+  });
+  return wrap;
+}
+
+function renderReleaseRail() {
+  const releases = state.roadmap?.releases || [];
+  if (!releases.length) return el("div");
+  const wrap = el("div", { class: "release-rail", id: "release-rail" });
+  wrap.append(el("span", { class: "rr-h" }, "Release"));
+  releases.forEach((r) => {
+    const prog = releaseProgress(r.id);
+    const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
+    wrap.append(el("div", { class: "step" + (r.status === "active" ? " active" : "") + (state.nav.release === r.id ? " sel" : ""), onclick: () => toggleNavRelease(r.id) },
+      el("div", { class: "st-top" },
+        el("span", {}, r.emoji || "🚀"), el("span", {}, r.title || r.id),
+        r.status === "active" ? el("span", { class: "st-you" }, "you") : null),
+      el("div", { class: "st-prog" }, el("i", { style: `width:${pct}%` })),
+      el("div", { class: "st-meta" }, `${prog.done}/${prog.total} epics · ${r.status}`),
     ));
   });
   return wrap;
@@ -896,7 +930,7 @@ function renderBoardView() {
 }
 function renderColumn(st) {
   const meta = statusMeta(st);
-  const items = allEpics().filter((x) => x.epic.status === st && epicMatches(x.epic) && phaseSelected(x.phase.id));
+  const items = allEpics().filter((x) => x.epic.status === st && epicVisible(x));
   const col = el("div", { class: "col", "data-status": st,
     ondragover: (e) => { e.preventDefault(); col.classList.add("drop"); },
     ondragleave: () => col.classList.remove("drop"),
@@ -917,6 +951,8 @@ function renderCard(x) {
   const done = tasks.filter((t) => t.status === "done").length;
   const am = assigneeMeta(e.assignee);
   const rd = relDate(e.planned);
+  const relId = resolveRelease(x);
+  const rel = relId ? releaseMeta(relId) : null;
   const card = el("div", {
     class: "card" + (x.archived ? " arch" : "") + (e.status === "blocked" ? " blocked-edge" : ""),
     draggable: x.archived ? "false" : "true",
@@ -932,6 +968,7 @@ function renderCard(x) {
     el("div", { class: "ctitle" }, e.title),
     el("div", { class: "chips" },
       chip(am.emoji + " " + am.label, "assignee"),
+      rel ? chip((rel.emoji ? rel.emoji + " " : "") + rel.title, "release") : null,
       ...(e.labels || []).map((l) => chip((labelEmoji(l) ? labelEmoji(l) + " " : "") + l)),
       rd ? chip("📅 " + rd.txt, "date " + rd.cls) : null,
     ),
@@ -946,10 +983,10 @@ function renderCard(x) {
 function renderTimeline() {
   const wrap = el("div", { class: "timeline", id: "content" });
   const upId = resolveNext(state.next?.next)?.epic?.id;
-  const phases = (state.roadmap?.phases || []).filter((p) => phaseSelected(p.id));
-  if (!phases.length) { wrap.append(el("div", { class: "muted", style: "padding:24px" }, "No phases match the filters.")); return wrap; }
+  const phases = (state.roadmap?.phases || []).filter((p) => !state.nav.phase || p.id === state.nav.phase);
+  if (!phases.length) { wrap.append(el("div", { class: "muted", style: "padding:24px" }, "No phases match navigation.")); return wrap; }
   phases.forEach((p) => {
-    const eps = (p.epics || []).filter((e) => epicMatches(e)).slice().sort((a, b) => compareEpicId(a.id, b.id));
+    const eps = (p.epics || []).filter((e) => epicVisible({ epic: e, phase: p, archived: false })).slice().sort((a, b) => compareEpicId(a.id, b.id));
     const prog = phaseProgress(p);
     const lane = el("div", { class: "lane" + (p.status === "active" ? " active" : ""), id: "lane-" + p.id });
     lane.append(el("div", { class: "lane-head" },
@@ -1104,6 +1141,15 @@ function drawerContent(x) {
       el("div", { class: "field" }, el("label", {}, "Status"), statusSel)),
     el("div", { class: "field" }, el("label", {}, "Planned"), plannedInp),
     renderLabelPicker(e, ro),
+  );
+  const relId = resolveRelease(x);
+  if (relId) {
+    const rel = releaseMeta(relId);
+    const releaseDoc = e.releaseDoc || rel.releaseDoc;
+    body.append(el("div", { class: "ge" }, el("div", { class: "k" }, "🚀 Release"), el("div", { class: "v" }, (rel.emoji ? rel.emoji + " " : "") + rel.title + " (" + rel.id + ")")));
+    if (releaseDoc) body.append(el("div", { class: "ge" }, el("div", { class: "k" }, "📄 Release doc"), el("div", { class: "v" }, el("a", { href: "./" + releaseDoc, target: "_blank", rel: "noopener" }, releaseDoc))));
+  }
+  body.append(
     el("div", { class: "ge" }, el("div", { class: "k" }, "🎯 Goal"), el("div", { class: "v" }, e.goal || "—")),
     el("div", { class: "ge" }, el("div", { class: "k" }, "✅ Exit"), el("div", { class: "v" }, e.exit || "—")),
   );

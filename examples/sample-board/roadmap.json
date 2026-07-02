@@ -3,18 +3,39 @@
   "version": 1,
   "project": "Sample App",
   "updated": "2026-06-22",
+  "releases": [
+    {
+      "id": "v1",
+      "title": "MVP",
+      "emoji": "🚀",
+      "status": "active",
+      "goal": "A shippable first version users can sign up for and use daily.",
+      "exit": "A new user signs up, completes onboarding, and performs the core action on production.",
+      "releaseDoc": "releases/v1.md"
+    },
+    {
+      "id": "v2",
+      "title": "Growth",
+      "emoji": "🌱",
+      "status": "planned",
+      "goal": "Features that bring users back.",
+      "exit": "Weekly retention is measurable and trending up."
+    }
+  ],
   "phases": [
     {
       "id": "P1",
       "title": "MVP",
       "emoji": "🔨",
       "status": "active",
+      "release": "v1",
       "goal": "A usable first version a real user can sign up for and use daily.",
       "exit": "A new user signs up, completes onboarding, and performs the core action without help.",
       "epics": [
         {
           "id": "E1.1", "title": "Auth and sign-up", "emoji": "🔐",
           "status": "active", "assignee": "ai", "labels": ["backend", "api"],
+          "release": "v1",
           "planned": "2026-06-25", "order": 1,
           "goal": "Email + password sign-up with sessions in httpOnly cookies.",
           "exit": "A new email registers, logs in, and stays logged in across a refresh.",
@@ -28,6 +49,7 @@
         {
           "id": "E1.2", "title": "Onboarding wizard", "emoji": "🧭",
           "status": "next", "assignee": "ai+verify", "labels": ["frontend", "design"],
+          "release": "v1",
           "planned": null, "order": 2,
           "goal": "A 3-step wizard that gets a new user to their first value.",
           "exit": "A first-time user finishes the wizard and lands on a populated home screen.",
@@ -61,6 +83,7 @@
       "title": "Growth",
       "emoji": "🌱",
       "status": "planned",
+      "release": "v2",
       "goal": "Features that bring users back.",
       "exit": "Weekly retention is measurable and trending up.",
       "epics": [

@@ -17,6 +17,20 @@
       ]
     },
     "label": { "type": "string", "minLength": 1 },
+    "release": {
+      "type": "object",
+      "required": ["id", "title", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "emoji": { "type": "string" },
+        "status": { "enum": ["planned", "active", "done"] },
+        "goal": { "type": "string" },
+        "exit": { "type": "string" },
+        "releaseDoc": { "type": "string", "description": "Relative path to release exit-criteria markdown outside the board" }
+      }
+    },
     "task": {
       "type": "object",
       "required": ["id", "title", "status"],
@@ -46,6 +60,8 @@
         "shipped": { "$ref": "#/definitions/date" },
         "order": { "type": "integer", "minimum": 0 },
         "phase": { "type": "string" },
+        "release": { "type": "string", "description": "Release id, e.g. v1" },
+        "releaseDoc": { "type": "string", "description": "Relative path to release exit-criteria markdown" },
         "goal": { "type": "string", "minLength": 1 },
         "exit": { "type": "string", "minLength": 1 },
         "body": { "type": "string", "description": "Relative path to a markdown body, e.g. epics/E1.26.md" },
@@ -63,6 +79,7 @@
         "status": { "enum": ["planned", "active", "done"] },
         "goal": { "type": "string" },
         "exit": { "type": "string" },
+        "release": { "type": "string", "description": "Default release id for epics in this phase" },
         "epics": { "type": "array", "items": { "$ref": "#/definitions/epic" } }
       }
     }
@@ -72,6 +89,7 @@
     "version": { "type": "integer", "const": 1 },
     "project": { "type": "string" },
     "updated": { "$ref": "#/definitions/date" },
-    "phases": { "type": "array", "items": { "$ref": "#/definitions/phase" } }
+    "phases": { "type": "array", "items": { "$ref": "#/definitions/phase" } },
+    "releases": { "type": "array", "items": { "$ref": "#/definitions/release" } }
   }
 }

@@ -12,7 +12,7 @@ This creates `docs/board/` with:
 
 ```
 docs/board/
-  roadmap.json        live board: phases -> epics -> tasks
+  roadmap.json        live board: phases, releases, epics, tasks
   archive.json        finished/archived epics
   next.json           the single next action + critical path + blockers
   board.tokens.json   theme + emoji vocabulary (re-skin here)
@@ -49,6 +49,7 @@ This appends a `backlog` epic (next id in the active phase) and creates
 | flag | meaning |
 |---|---|
 | `--phase P2` | target a specific phase (default: the active one) |
+| `--release v1` | stamp release id on new epic (inherits `phase.release` if omitted) |
 | `--id E2.7` | force an id |
 | `--assignee` | `ai` \| `me` \| `ai+verify` (default `ai`) |
 | `--labels a,b` | comma-separated labels |

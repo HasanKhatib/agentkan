@@ -1,10 +1,10 @@
 {
-  "updated": "2026-06-22",
+  "updated": "2026-07-02",
   "next": "E1.14-T2",
-  "note": "npm publish v0.1.1 (requires 2FA OTP) then verify repository URL on npm",
+  "note": "Ship agentkan v0.1.5 (releases alongside phases). Commit, tag, npm publish, push.",
   "criticalPath": [
     {
-      "title": "Revoke burned npm token (if not done)",
+      "title": "npm publish v0.1.5 (2FA OTP if enabled)",
       "assignee": "me",
       "status": "todo",
       "unblocks": "E1.14"

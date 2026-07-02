@@ -1,6 +1,6 @@
 # agentkan
 
-A local-first roadmap board for building with AI agents. Epics and tasks live as plain JSON and markdown in your repo; a single `index.html` renders them as a drag-and-drop board you can edit on localhost. No server, no build step, no account, no lock-in.
+A local-first roadmap board for building with AI agents. Epics and tasks live as plain JSON and markdown in your repo; phases group execution and optional releases group shippable scope (`v1`, `v2`). A single `index.html` renders them as a drag-and-drop board you can edit on localhost. No server, no build step, no account, no lock-in.
 
 It fixes one friction: when an AI keeps appending to a markdown to-do file, the file grows without bound and you lose track of what is actually yours to do. agentkan splits **state** (structured, movable) from **prose** (context for agents) and puts you in control of what is done.
 

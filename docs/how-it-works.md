@@ -6,7 +6,7 @@ Practical guide for using agentkan day to day. Install and CLI flags: [getting s
 
 | File | Owns |
 |------|------|
-| `roadmap.json` | State: phases, epics, tasks, status columns |
+| `roadmap.json` | State: phases, releases, epics, tasks, status columns |
 | `epics/<ID>.md` | Prose: context, reasoning, how (agents read this) |
 | `next.json` | Pointer: single next action, critical path, blockers |
 | `archive.json` | Finished epics off the live board |
@@ -48,6 +48,7 @@ flowchart TD
    ```bash
    npx agentkan epic new "Billing integration" \
      --phase P1 \
+     --release v1 \
      --assignee ai+verify \
      --labels backend,api
    ```
@@ -62,7 +63,7 @@ You can skip the CLI and have the agent write the epic directly into `roadmap.js
 
 ### Daily work
 
-Run `npx agentkan serve`, then work the **Board** (drag cards between columns, open a card to edit fields and add/rename/toggle tasks) or the **Timeline** (the roadmap by phase, with a "you are here" marker). Edit **Up next** from the sidebar, filter by Who/Labels (filter bar) and phase (stepper), and switch light/dark with the ☀/🌙 toggle. A served board saves automatically. You own moving epics to Done and archiving. See [viewer](viewer.md).
+Run `npx agentkan serve`, then work the **Board** (drag cards between columns, open a card to edit fields and add/rename/toggle tasks) or the **Timeline** (the roadmap by phase, with a "you are here" marker). Edit **Up next** from the sidebar, filter by assignee, focus by phase or release (stepper/rail), and switch light/dark with the ☀/🌙 toggle. A served board saves automatically. You own moving epics to Done and archiving. See [viewer](viewer.md).
 
 ### Add tasks under an epic
 
@@ -91,27 +92,39 @@ Mirror detail in `epics/<ID>.md` if agents need prose context.
 
 ### Create or link epics to a business phase
 
-Phases live in `roadmap.json`:
+Phases live in `roadmap.json` and group execution work. **Releases** (optional)
+define shippable product scope:
 
 ```jsonc
-{
-  "id": "P2",
-  "title": "Growth",
-  "emoji": "🌱",
-  "status": "planned",
-  "goal": "Features that bring users back.",
-  "exit": "Weekly retention is measurable.",
-  "epics": []
-}
+"releases": [
+  { "id": "v1", "title": "MVP", "status": "active", "goal": "...", "exit": "..." }
+],
+"phases": [
+  {
+    "id": "P2",
+    "title": "Growth",
+    "emoji": "🌱",
+    "status": "planned",
+    "release": "v1",
+    "goal": "Features that bring users back.",
+    "exit": "Weekly retention is measurable.",
+    "epics": []
+  }
+]
 ```
 
-There is no `phase new` CLI. Add phases by editing JSON or asking your agent. Attach epics with `epic new --phase P2` or by appending to `phases[n].epics`.
+Two phases can share one release (`P1` and `P2` both `"release": "v1"`).
+Epic IDs stay stable (`E1.26`); they are not renamed per release.
+
+There is no `phase new` or `release new` CLI. Add phases and releases by editing
+JSON or asking your agent. Attach epics with `epic new --phase P2 --release v1`
+or by appending to `phases[n].epics`.
 
 Convention: one phase is usually `active` at a time. That is not enforced by code.
 
 ### New labels
 
-**Vocabulary** (emoji + filter chips) in `board.tokens.json`:
+**Vocabulary** (emoji on cards) in `board.tokens.json`:
 
 ```json
 "labels": {
@@ -147,7 +160,8 @@ Agents must not mark an epic `done` or archive unless you ask in that turn. That
 |-------|--------|-----|----------|
 | Theme colors | `board.tokens.json` → `theme` | — | auto |
 | Label/assignee/status emoji | `board.tokens.json` | — | auto |
-| New label vocabulary | `board.tokens.json` | — | filter chips |
+| New label vocabulary | `board.tokens.json` | — | legend / drawer |
+| New release | `roadmap.json` | no | release rail |
 | New epic stub | `roadmap.json` + `epics/*.md` | `epic new` | no |
 | New task | `roadmap.json` | no | toggle only |
 | New phase | `roadmap.json` | no | no |

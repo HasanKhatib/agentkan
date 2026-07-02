@@ -32,6 +32,7 @@ ${c.bold("Usage")}
 
 ${c.bold("epic new options")}
   --phase P2        target phase (default: active phase, else last)
+  --release v1      stamp release id on new epic (inherits phase.release if omitted)
   --id E2.7         force an id
   --assignee ai     ai | me | ai+verify   (default ai)
   --labels a,b      comma-separated

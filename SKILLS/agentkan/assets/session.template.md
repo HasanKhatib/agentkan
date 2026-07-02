@@ -6,6 +6,8 @@ Optional narrative log. Board state lives in `docs/board/` (`roadmap.json`, `nex
 
 ## What shipped
 
+<!-- Optional: release focus (e.g. v1) if relevant -->
+
 ## Decisions made
 
 ## Next

@@ -39,6 +39,7 @@ Read the full output before writing anything.
 - Tasks in progress → `doing`
 - Epics reflect truth: `active`, `blocked`, `next`, `backlog` as appropriate
 - Update phase status if a phase completed or priority changed
+- Update release status if a release shipped or became the current focus
 - Do **not** set epic `done` or archive unless the user asked this turn
 
 **Step 4: Refresh next.json**

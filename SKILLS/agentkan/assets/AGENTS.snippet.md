@@ -10,4 +10,4 @@ Board directory: `{{BOARD_DIR}}/`. State lives in JSON (`roadmap.json`, `next.js
 
 **Human owns:** dragging epics to Done and archiving in the viewer (`npx agentkan serve {{BOARD_DIR}}`).
 
-**New epic stub:** `npx agentkan epic new "<title>" [--phase Pn]`, then fill goal, exit, tasks, and `{{BOARD_DIR}}/epics/<ID>.md`.
+**New epic stub:** `npx agentkan epic new "<title>" [--phase Pn] [--release v1]`, then fill goal, exit, tasks, and `{{BOARD_DIR}}/epics/<ID>.md`.
