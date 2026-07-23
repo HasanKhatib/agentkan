@@ -9,7 +9,7 @@ agentkan ships an [Agent Skill](https://platform.claude.com/docs/en/agents-and-t
 Follows Anthropic's filesystem-based skill structure (metadata in frontmatter, instructions in `SKILL.md`, references loaded on demand):
 
 ```
-SKILLS/agentkan/
+skills/agentkan/
   SKILL.md                    # Workflow, boundaries, routing
   references/
     onboarding.md             # New project, no board yet
@@ -31,24 +31,37 @@ SKILLS/agentkan/
 
 ## Install
 
+**GitHub CLI** (recommended, requires `gh` ≥ 2.90):
+
+```bash
+# Cursor (project)
+gh skill install HasanKhatib/agentkan agentkan --agent cursor
+
+# Claude Code (project)
+gh skill install HasanKhatib/agentkan agentkan --agent claude-code
+
+# Available everywhere for that agent
+gh skill install HasanKhatib/agentkan agentkan --agent cursor --scope user
+```
+
 **Claude Code** — copy the skill folder:
 
 ```bash
-cp -r SKILLS/agentkan ~/.claude/skills/agentkan
+cp -r skills/agentkan ~/.claude/skills/agentkan
 # or project-local:
-mkdir -p .claude/skills && cp -r SKILLS/agentkan .claude/skills/agentkan
+mkdir -p .claude/skills && cp -r skills/agentkan .claude/skills/agentkan
 ```
 
 From npm after `npm install -D agentkan`:
 
 ```bash
-cp -r node_modules/agentkan/SKILLS/agentkan .claude/skills/agentkan
+cp -r node_modules/agentkan/skills/agentkan .claude/skills/agentkan
 ```
 
 **Cursor** — project or personal skills directory:
 
 ```bash
-mkdir -p .cursor/skills && cp -r SKILLS/agentkan .cursor/skills/agentkan
+mkdir -p .cursor/skills && cp -r skills/agentkan .cursor/skills/agentkan
 ```
 
 **claude.ai** — zip and upload in Settings → Features:
@@ -57,7 +70,7 @@ mkdir -p .cursor/skills && cp -r SKILLS/agentkan .cursor/skills/agentkan
 ./scripts/pack-skill.sh   # writes agentkan.skill
 ```
 
-**Any agent** — install the skill, or merge `assets/AGENTS.snippet.md` into project instructions and point at `SKILLS/agentkan/SKILL.md`.
+**Any agent** — install the skill, or merge `assets/AGENTS.snippet.md` into project instructions and point at `skills/agentkan/SKILL.md`.
 
 ## What the skill teaches
 
@@ -93,4 +106,4 @@ When you say "add an epic" or "fill epic E1.2", the agent:
 
 Say "handoff" at session end. The agent runs a git snapshot (`scripts/status.sh`), sets statuses to reality, refreshes `next.json`, validates, summarizes briefly, and optionally writes a session log to `docs/sessions/`.
 
-Full instructions: [SKILLS/agentkan/SKILL.md](../SKILLS/agentkan/SKILL.md).
+Full instructions: [skills/agentkan/SKILL.md](../skills/agentkan/SKILL.md).

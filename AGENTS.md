@@ -22,6 +22,6 @@ A local-first epic/task roadmap board for building with AI agents: hybrid JSON s
 
 ## Session
 **Start:** read `docs/board/next.json` and skim active epics in `docs/board/roadmap.json`. For deeper context see `docs/getting-started.md` and `docs/origin.md`.
-**Board work:** follow `SKILLS/agentkan/SKILL.md` (this copy is for developing the tool; consumer projects install the skill and merge `SKILLS/agentkan/assets/AGENTS.snippet.md`). Edit JSON safely, run `npm run validate`, never mark an epic `done` or archive unless the user asks in this turn.
+**Board work:** follow `skills/agentkan/SKILL.md` (this copy is for developing the tool; consumer projects install the skill and merge `skills/agentkan/assets/AGENTS.snippet.md`). Edit JSON safely, run `npm run validate`, never mark an epic `done` or archive unless the user asks in this turn.
 **End (handoff):** set statuses to reality, refresh `docs/board/next.json` (`next`, `criticalPath`, `risks`), bump `updated` dates, run `npm run validate`, summarize changes briefly.
 **New epic stub:** `npx agentkan epic new "<title>" [--phase Pn] [--release v1]`, then fill goal, exit, tasks, and `docs/board/epics/<ID>.md`.

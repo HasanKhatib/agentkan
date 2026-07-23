@@ -8,7 +8,7 @@ Wire agentkan into the **consumer project's** agent instructions. Do not copy th
 |------|---------|
 | Project `AGENTS.md` | Stable rules: board path, session start/end, pointer to this skill |
 | `CLAUDE.md` | Often one line: `@AGENTS.md` |
-| Cursor rules / skills | Install `SKILLS/agentkan` under `.cursor/skills/agentkan` |
+| Cursor rules / skills | Install `skills/agentkan` (e.g. `gh skill install … --agent cursor`) |
 | This skill | Workflows for onboard, migrate, edit board, handoff |
 
 ## AGENTS.md merge
@@ -32,7 +32,7 @@ Or paste the Roadmap section from AGENTS.snippet.md if the project has no AGENTS
 
 ## Cursor
 
-1. Copy skill: `cp -r SKILLS/agentkan .cursor/skills/agentkan` (from package or clone)
+1. Install skill: `gh skill install HasanKhatib/agentkan agentkan --agent cursor` (or `cp -r skills/agentkan .cursor/skills/agentkan`)
 2. Optional rule in `.cursor/rules/`: "When editing files under docs/board/ or when the user mentions epics, tasks, or handoff, follow the agentkan skill."
 
 ## Custom board path

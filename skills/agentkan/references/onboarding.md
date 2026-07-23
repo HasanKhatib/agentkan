@@ -49,13 +49,15 @@ Opens localhost. The human drags cards, toggles tasks, and archives done work. T
 **Claude Code** (project):
 
 ```bash
+gh skill install HasanKhatib/agentkan agentkan --agent claude-code
+# or copy:
 mkdir -p .claude/skills
-cp -r /path/to/agentkan/SKILLS/agentkan .claude/skills/agentkan
+cp -r /path/to/agentkan/skills/agentkan .claude/skills/agentkan
 ```
 
-Or from npm package after `npm install -D agentkan`: copy `node_modules/agentkan/SKILLS/agentkan`.
+Or from npm package after `npm install -D agentkan`: copy `node_modules/agentkan/skills/agentkan`.
 
-**Cursor:** copy to `.cursor/skills/agentkan` (project) or `~/.cursor/skills/agentkan` (personal).
+**Cursor:** `gh skill install HasanKhatib/agentkan agentkan --agent cursor`, or copy to `.cursor/skills/agentkan` (project) / `~/.cursor/skills/agentkan` (personal).
 
 ## Wire the project for agents
 

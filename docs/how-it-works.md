@@ -19,7 +19,7 @@ JSON is source of truth for **status**. Markdown is source of truth for **how**.
 
 | Surface | Role |
 |---------|------|
-| **Your agent** (`SKILLS/agentkan/SKILL.md`) | Shape work: refine ideas, fill epics, add tasks, edit JSON |
+| **Your agent** (`skills/agentkan/SKILL.md`) | Shape work: refine ideas, fill epics, add tasks, edit JSON |
 | **CLI** | Fast epic stubs (`epic new`) |
 | **Board** (`agentkan serve`) | Operate: drag cards, toggle tasks, archive |
 
