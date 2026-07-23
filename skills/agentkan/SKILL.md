@@ -1,6 +1,13 @@
 ---
 name: agentkan
-description: Sets up and maintains an agentkan roadmap board (JSON epics and tasks plus markdown bodies) in a project. Use when the user wants to organize scattered tasks, migrate from roadmap.md or todo lists, scaffold a board, add or refine epics, update next.json, run a session handoff, or plan work with an AI-shared board. Triggers: set up agentkan, migrate my roadmap, organize my tasks, add an epic, new epic, fill epic, what's next, handoff, update the board, or edits to roadmap.json or next.json.
+description: >-
+  Sets up and maintains an agentkan roadmap board (JSON epics and tasks plus
+  markdown bodies) in a project. Use when the user wants to organize scattered
+  tasks, migrate from roadmap.md or todo lists, scaffold a board, add or refine
+  epics, update next.json, run a session handoff, or plan work with an AI-shared
+  board. Triggers: set up agentkan, migrate my roadmap, organize my tasks, add an
+  epic, new epic, fill epic, what's next, handoff, update the board, or edits to
+  roadmap.json or next.json.
 ---
 
 # agentkan
