@@ -92,8 +92,8 @@
     transition: width .2s ease, flex-basis .2s ease, border-color .2s ease;
   }
   .sidebar-inner {
-    width: 264px; height: 100vh; overflow-y: auto; padding: 16px 14px;
-    display: flex; flex-direction: column; gap: 18px;
+    width: 264px; height: 100vh; overflow-y: auto; padding: 14px 12px;
+    display: flex; flex-direction: column; gap: 12px;
   }
   @media (min-width: 861px) {
     .shell.side-collapsed .sidebar { width: 0; flex-basis: 0; border-right-color: transparent; }
@@ -174,33 +174,51 @@
 
   .filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
-  /* ---------- Phase stepper ---------- */
-  .stepper { display: flex; gap: 8px; padding: 10px 24px; overflow-x: auto; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
-  .step { flex: 0 0 auto; min-width: 160px; border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 10px; cursor: pointer; background: var(--bg-canvas); transition: border-color .12s, background .12s; }
-  .step:hover { border-color: #d4d7dd; }
-  .step.active { border-color: var(--text-primary); }
-  .step.sel { background: var(--brand-subtle); }
-  .step .st-top { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
-  .step .st-you { margin-left: auto; font-size: 9.5px; text-transform: uppercase; letter-spacing: .04em; background: var(--inverse-bg); color: var(--inverse-fg); border-radius: var(--r-pill); padding: 1px 7px; }
-  .step .st-prog { margin-top: 7px; height: 4px; background: var(--bg-sunken); border-radius: 2px; overflow: hidden; }
-  .step .st-prog > i { display: block; height: 100%; background: var(--brand); }
-  .step .st-meta { font-size: 10.5px; color: var(--text-secondary); margin-top: 5px; }
+  /* ---------- Sidebar nav (phases / releases) ---------- */
+  .side-nav { display: flex; flex-direction: column; gap: 4px; }
+  .side-item {
+    display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+    border: 1px solid var(--border); border-radius: var(--r-md); padding: 8px 10px;
+    background: var(--bg-canvas); cursor: pointer; font-size: 12.5px; color: var(--text-primary);
+    transition: border-color .12s, background .12s, box-shadow .12s;
+  }
+  .side-item:hover { border-color: #d4d7dd; }
+  .side-item.active-phase { border-color: var(--text-primary); }
+  .side-item.sel { box-shadow: inset 3px 0 0 var(--item-color, var(--text-primary)); background: color-mix(in srgb, var(--item-color, var(--brand-subtle)) 14%, var(--bg-canvas)); border-color: color-mix(in srgb, var(--item-color, var(--border)) 40%, var(--border)); font-weight: 600; }
+  .side-item .si-meta { margin-left: auto; font-size: 10px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .side-item .si-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; background: var(--item-color, var(--text-secondary)); }
+  .side-item .si-you { font-size: 9px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
 
-  /* ---------- Release rail ---------- */
-  .release-rail { display: flex; gap: 8px; padding: 8px 24px 10px; overflow-x: auto; border-bottom: 1px solid var(--border); background: var(--bg-canvas); }
-  .release-rail .rr-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); align-self: center; flex: 0 0 auto; margin-right: 4px; }
-  .release-rail .step { min-width: 140px; background: var(--bg-surface); }
-  .chip.release { background: var(--brand-subtle); border-color: var(--border); color: var(--text-primary); }
+  /* ---------- Filter bar (compact) ---------- */
+  .filterbar {
+    padding: 6px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: var(--bg-surface); min-height: 40px;
+  }
+  .filterbar .fb-assignees { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; flex: 1; min-width: 0; }
+  .filterbar .pill { padding: 4px 9px; font-size: 11.5px; }
+  .filterbar .fb-more { flex: 0 0 auto; position: relative; }
+  .filter-count { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; border-radius: var(--r-pill); background: var(--inverse-bg); color: var(--inverse-fg); font-size: 9.5px; font-weight: 700; margin-left: 4px; padding: 0 4px; }
 
-  /* ---------- Filter bar ---------- */
-  .filterbar { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: var(--bg-surface); }
-  .fb-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-  .fb-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); width: 68px; flex: 0 0 auto; }
+  /* Filter popover */
+  .filter-pop {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
+    width: min(320px, 92vw); background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: var(--r-lg); box-shadow: var(--shadow-lg); padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .filter-pop .fp-sec { display: flex; flex-direction: column; gap: 6px; }
+  .filter-pop .fp-h { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); font-weight: 600; }
+  .filter-pop .fp-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .filter-pop-backdrop { position: fixed; inset: 0; z-index: 25; }
+
+  .chip.release { border-color: transparent; color: var(--text-primary); font-weight: 600; }
+  .chip.phase { background: var(--bg-sunken); border-color: transparent; color: var(--text-secondary); font-size: 10.5px; }
   .pill.add { font-weight: 700; color: var(--text-secondary); padding: 6px 10px; }
 
   /* ---------- Board ---------- */
   .board { display: flex; gap: 16px; padding: 20px 24px 48px; overflow-x: auto; align-items: flex-start; min-height: 60vh; }
-  .col { background: var(--bg-sunken); border-radius: var(--r-lg); min-width: 288px; width: 288px; flex: 0 0 auto; display: flex; flex-direction: column; max-height: calc(100vh - 190px); }
+  .col { background: var(--bg-sunken); border-radius: var(--r-lg); min-width: 288px; width: 288px; flex: 0 0 auto; display: flex; flex-direction: column; max-height: calc(100vh - 130px); }
   .col-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
   .col-head .nm { font-weight: 600; font-size: 13px; letter-spacing: -.01em; }
   .col-head .ct { margin-left: auto; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 1px 9px; font-size: 11.5px; color: var(--text-secondary); }
@@ -231,18 +249,36 @@
   .progress > i { display: block; height: 100%; background: var(--brand); }
   .ptext { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
   .card.blocked-edge { border-left: 3px solid var(--danger); }
+  .card.rel-edge { border-left: 3px solid var(--rel-color, var(--border)); }
 
   /* ---------- Timeline ---------- */
-  .timeline { padding: 20px 24px 48px; display: flex; flex-direction: column; gap: 24px; }
-  .lane { scroll-margin-top: 80px; }
-  .lane-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-  .lane-head .lh-title { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
-  .lane-head .lh-you { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; background: var(--inverse-bg); color: var(--inverse-fg); border-radius: var(--r-pill); padding: 2px 9px; font-weight: 600; }
-  .lane-head .lh-prog { margin-left: auto; font-size: 11.5px; color: var(--text-secondary); }
-  .lane.active .lh-title { color: var(--text-primary); }
-  .lane-epics { display: flex; flex-wrap: wrap; gap: 10px; }
+  .timeline { padding: 16px 20px 48px; display: flex; flex-direction: column; gap: 20px; }
+  .tl-wrap { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 16px 16px 12px; overflow-x: auto; }
+  .tl-axis { position: relative; height: 28px; border-bottom: 1px solid var(--border); margin-bottom: 14px; min-width: 640px; }
+  .tl-tick { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 10px; color: var(--text-secondary); white-space: nowrap; padding-bottom: 6px; }
+  .tl-tick::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 6px; background: var(--border); }
+  .tl-today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); opacity: .85; z-index: 2; pointer-events: none; }
+  .tl-today-lbl { position: absolute; top: -2px; transform: translateX(-50%); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
+  .tl-track { position: relative; min-width: 640px; margin-bottom: 10px; }
+  .tl-track-h { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; }
+  .tl-lane { position: relative; height: 36px; background: var(--bg-sunken); border-radius: var(--r-md); }
+  .tl-node {
+    position: absolute; top: 5px; height: 26px; border-radius: var(--r-sm); cursor: pointer;
+    display: flex; align-items: center; gap: 5px; padding: 0 10px; font-size: 11.5px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;
+    border: 1px solid transparent; transition: transform .12s, box-shadow .12s;
+  }
+  .tl-node:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+  .tl-node.sel { outline: 2px solid var(--text-primary); outline-offset: 1px; z-index: 3; }
+  .tl-node.release { color: #fff; }
+  .tl-node.phase { background: var(--bg-surface); border-color: var(--border); color: var(--text-primary); }
+  .tl-node.phase.sel { outline-color: var(--text-primary); background: var(--brand-subtle); }
+  .tl-spawn { margin-top: 4px; }
+  .tl-spawn-h { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .tl-spawn-h h3 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: -.02em; }
+  .tl-spawn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
   .tbar {
-    width: 230px; border: 1px solid var(--border); border-left: 4px solid var(--st-color, var(--border));
+    border: 1px solid var(--border); border-left: 4px solid var(--rel-color, var(--st-color, var(--border)));
     border-radius: var(--r-md); padding: 10px 12px; background: var(--bg-surface); cursor: pointer;
     box-shadow: var(--shadow); transition: box-shadow .12s, transform .12s;
   }
@@ -378,6 +414,8 @@ function initialTheme() {
   return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+const RELEASE_PALETTE = ["#6D5AE6", "#0EA5E9", "#059669", "#D97706", "#DC2626", "#DB2777", "#7C3AED", "#0891B2"];
+
 const state = {
   tokens: null, roadmap: null, archive: null, next: null,
   canWrite: location.protocol === "http:" || location.protocol === "https:",
@@ -387,7 +425,8 @@ const state = {
   greeting: GREETINGS[Math.floor(Math.random() * GREETINGS.length)],  // chosen once per load
   showArchived: false,
   nav: { phase: null, release: null },
-  filter: { assignee: new Set(), q: "" },
+  filter: { assignee: new Set(), label: new Set(), q: "" },
+  filterPanelOpen: false,
   openEpicId: null,
   nextEditorOpen: false,
   labelManagerOpen: false,
@@ -420,8 +459,18 @@ function assigneeMeta(a) { return state.tokens?.assignees?.[a] || { emoji: "", l
 function statusMeta(s) { return state.tokens?.statuses?.[s] || { emoji: "", label: s }; }
 function labelEmoji(l) { return state.tokens?.labels?.[l] || ""; }
 
-function relDate(iso) {
-  if (!iso) return null;
+function releaseColor(id) {
+  if (!id) return "var(--text-secondary)";
+  const custom = state.tokens?.releases?.[id];
+  if (typeof custom === "string") return custom;
+  if (custom?.color) return custom.color;
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return RELEASE_PALETTE[Math.abs(h) % RELEASE_PALETTE.length];
+}
+
+function relDate(iso, epicStatus) {
+  if (!iso || epicStatus === "done") return null;
   const d = new Date(iso + "T00:00:00");
   const now = new Date(); now.setHours(0, 0, 0, 0);
   const days = Math.round((d - now) / 86400000);
@@ -520,11 +569,16 @@ function resolveNext(ref) {
 function epicMatches(e) {
   const f = state.filter;
   if (f.assignee.size && !f.assignee.has(e.assignee)) return false;
+  if (f.label.size && !(e.labels || []).some((l) => f.label.has(l))) return false;
   if (f.q) {
     const hay = (e.id + " " + e.title + " " + (e.labels || []).join(" ")).toLowerCase();
     if (!hay.includes(f.q.toLowerCase())) return false;
   }
   return true;
+}
+function activeFilterCount() {
+  const f = state.filter;
+  return f.label.size + (state.nav.phase ? 1 : 0) + (state.nav.release ? 1 : 0);
 }
 function resolveRelease(x) { return x.epic.release || x.phase?.release || null; }
 function releaseMeta(id) {
@@ -541,6 +595,43 @@ function phaseProgress(p) { const eps = p.epics || []; return { done: eps.filter
 function releaseProgress(releaseId) {
   const eps = allEpics().filter((x) => !x.archived && resolveRelease(x) === releaseId);
   return { done: eps.filter((x) => x.epic.status === "done").length, total: eps.length };
+}
+
+function timelineRange() {
+  const dates = [];
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  for (const x of allEpics()) {
+    if (x.epic.planned) dates.push(new Date(x.epic.planned + "T00:00:00"));
+  }
+  let start = dates.length ? new Date(Math.min(...dates)) : new Date(now);
+  let end = dates.length ? new Date(Math.max(...dates)) : new Date(now);
+  if (!dates.length) { end = new Date(now); end.setDate(end.getDate() + 84); }
+  start.setDate(start.getDate() - 14);
+  end.setDate(end.getDate() + 28);
+  if (end <= start) end.setDate(start.getDate() + 60);
+  const span = end - start || 1;
+  const pos = (d) => Math.max(0, Math.min(100, ((d - start) / span) * 100));
+  const months = [];
+  const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+  while (cursor <= end) {
+    months.push({ label: cursor.toLocaleDateString(undefined, { month: "short" }), pct: pos(cursor) });
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  return { start, end, span, pos, months, todayPct: pos(now) };
+}
+
+function refreshBoard() {
+  refreshContent();
+  refreshSidebar();
+  refreshFilterBar();
+}
+function sidebarScrollTop() {
+  const inner = document.querySelector(".sidebar-inner");
+  return inner ? inner.scrollTop : 0;
+}
+function restoreSidebarScroll(top) {
+  const inner = document.querySelector(".sidebar-inner");
+  if (inner) inner.scrollTop = top;
 }
 
 /* ---------- load ---------- */
@@ -685,11 +776,30 @@ function editNext(patch) {
 /* ---------- nav / filters ---------- */
 function toggleNavPhase(id) {
   state.nav.phase = state.nav.phase === id ? null : id;
-  render();
+  const scroll = sidebarScrollTop();
+  refreshBoard();
+  restoreSidebarScroll(scroll);
 }
 function toggleNavRelease(id) {
   state.nav.release = state.nav.release === id ? null : id;
+  const scroll = sidebarScrollTop();
+  refreshBoard();
+  restoreSidebarScroll(scroll);
+}
+function toggleFilterPanel() {
+  state.filterPanelOpen = !state.filterPanelOpen;
+  refreshFilterBar();
+}
+function clearAllFilters() {
+  state.filter.assignee.clear();
+  state.filter.label.clear();
+  state.filter.q = "";
+  state.nav.phase = null;
+  state.nav.release = null;
+  state.filterPanelOpen = false;
+  const scroll = sidebarScrollTop();
   render();
+  restoreSidebarScroll(scroll);
 }
 function toggleSidebar() {
   if (window.matchMedia("(max-width: 860px)").matches) { state.sidebarOpen = !state.sidebarOpen; }
@@ -778,13 +888,22 @@ function renderApp() {
 function refresh(id, node) { const old = $("#" + id); if (old) old.replaceWith(node); else render(); }
 function refreshContent() { refresh("content", renderContent()); }
 function refreshSidebar() { refresh("sidebar", renderSidebar()); }
+function refreshFilterBar() {
+  const old = $("#filterbar");
+  const node = renderFilterBar();
+  if (old) old.replaceWith(node);
+  else render();
+}
 
-function chip(text, cls = "") { return el("span", { class: "chip " + cls }, text); }
+function chip(text, cls = "", color) {
+  const style = color ? `background:color-mix(in srgb, ${color} 18%, var(--bg-canvas));border-color:color-mix(in srgb, ${color} 35%, var(--border));color:var(--text-primary)` : "";
+  return el("span", { class: "chip " + cls, style }, text);
+}
 
 function renderShell() {
   return el("div", { class: "shell" + (state.sidebarOpen ? " side-open" : "") + (state.sidebarCollapsed ? " side-collapsed" : "") },
     renderSidebar(),
-    el("div", { class: "main" }, renderTopbar(), renderStepper(), renderReleaseRail(), renderFilterBar(), renderContent()),
+    el("div", { class: "main" }, renderTopbar(), renderFilterBar(), renderContent()),
     el("div", { class: "side-scrim", onclick: () => { state.sidebarOpen = false; const sh = document.querySelector(".shell"); sh ? sh.classList.remove("side-open") : render(); } }),
   );
 }
@@ -803,18 +922,67 @@ function renderSidebar() {
   const inner = el("div", { class: "sidebar-inner" });
 
   inner.append(el("div", { class: "seg" },
-    el("button", { class: state.view === "board" ? "on" : "", onclick: () => { state.view = "board"; render(); } }, "▦ Board"),
-    el("button", { class: state.view === "timeline" ? "on" : "", onclick: () => { state.view = "timeline"; render(); } }, "▭ Timeline")));
+    el("button", { class: state.view === "board" ? "on" : "", onclick: () => { state.view = "board"; refreshBoard(); } }, "▦ Board"),
+    el("button", { class: state.view === "timeline" ? "on" : "", onclick: () => { state.view = "timeline"; refreshBoard(); } }, "▭ Timeline")));
 
   inner.append(renderSideNext());
+  inner.append(renderSidePhases());
+  inner.append(renderSideReleases());
 
   inner.append(el("div", { class: "side-sec" },
-    el("button", { class: "pill" + (state.showArchived ? " on" : ""), onclick: () => { state.showArchived = !state.showArchived; render(); } }, "🗄️ Archived"),
-    el("button", { class: "pill" + (state.legendOpen ? " on" : ""), onclick: () => { state.legendOpen = !state.legendOpen; render(); } }, "ℹ️ Legend"),
+    el("button", { class: "pill" + (state.showArchived ? " on" : ""), onclick: () => { const s = sidebarScrollTop(); state.showArchived = !state.showArchived; refreshBoard(); restoreSidebarScroll(s); } }, "🗄️ Archived"),
+    el("button", { class: "pill" + (state.legendOpen ? " on" : ""), onclick: () => { const s = sidebarScrollTop(); state.legendOpen = !state.legendOpen; refreshSidebar(); restoreSidebarScroll(s); } }, "ℹ️ Legend"),
     state.canWrite ? el("button", { class: "pill", onclick: openLabelManager }, "🏷️ Labels") : null));
   if (state.legendOpen) inner.append(renderLegend());
 
   return el("div", { class: "sidebar", id: "sidebar" }, inner);
+}
+
+function renderSidePhases() {
+  const phases = state.roadmap?.phases || [];
+  if (!phases.length) return el("div");
+  const sec = el("div", { class: "side-sec" });
+  sec.append(el("span", { class: "side-h" }, "Phases"));
+  const nav = el("div", { class: "side-nav" });
+  phases.forEach((p) => {
+    const prog = phaseProgress(p);
+    const sel = state.nav.phase === p.id;
+    nav.append(el("button", {
+      class: "side-item" + (p.status === "active" ? " active-phase" : "") + (sel ? " sel" : ""),
+      style: sel ? "--item-color: var(--text-primary)" : "",
+      onclick: () => toggleNavPhase(p.id),
+    },
+      el("span", {}, p.emoji || "📦"),
+      el("span", {}, p.title || p.id),
+      p.status === "active" ? el("span", { class: "si-you" }, "now") : null,
+      el("span", { class: "si-meta" }, `${prog.done}/${prog.total}`)));
+  });
+  sec.append(nav);
+  return sec;
+}
+
+function renderSideReleases() {
+  const releases = state.roadmap?.releases || [];
+  if (!releases.length) return el("div");
+  const sec = el("div", { class: "side-sec" });
+  sec.append(el("span", { class: "side-h" }, "Releases"));
+  const nav = el("div", { class: "side-nav" });
+  releases.forEach((r) => {
+    const prog = releaseProgress(r.id);
+    const sel = state.nav.release === r.id;
+    const color = releaseColor(r.id);
+    nav.append(el("button", {
+      class: "side-item" + (sel ? " sel" : ""),
+      style: `--item-color:${color}`,
+      onclick: () => toggleNavRelease(r.id),
+    },
+      el("span", { class: "si-dot" }),
+      el("span", {}, r.title || r.id),
+      r.status === "active" ? el("span", { class: "si-you" }, "now") : null,
+      el("span", { class: "si-meta" }, `${prog.done}/${prog.total}`)));
+  });
+  sec.append(nav);
+  return sec;
 }
 
 function renderSideNext() {
@@ -826,36 +994,88 @@ function renderSideNext() {
   if (!n) { sec.append(el("div", { class: "muted" }, "No next.json")); return sec; }
 
   const r = resolveNext(n.next);
-  const am = r && r.assignee ? assigneeMeta(r.assignee) : null;
   sec.append(el("div", { class: "side-now" + (r && r.epic ? " clickable" : ""), onclick: () => { if (r && r.epic) openDrawer(r.epic.id); } },
     el("div", { class: "now-title" }, r ? r.title : "Nothing queued"),
-    r && r.epic ? el("div", { class: "now-meta" }, el("span", {}, "in " + r.epic.id), am ? chip(am.emoji + " " + am.label, "assignee") : null) : null,
-    n.note ? el("div", { class: "now-note" }, n.note) : null,
   ));
-  if (n.criticalPath?.length) sec.append(el("div", { class: "side-mini" },
-    el("div", { class: "side-h" }, "🧑 Critical path"),
-    el("ul", {}, n.criticalPath.map((c) => el("li", {}, (typeof c === "string" ? c : c.title) + (c && c.unblocks ? ` → ${c.unblocks}` : ""))))));
-  if (n.risks?.length) sec.append(el("div", { class: "side-mini" },
-    el("div", { class: "side-h" }, "⚠️ Risks / watch"),
-    el("ul", {}, n.risks.map((c) => el("li", {}, c)))));
   return sec;
 }
 
-// Filter bar in the main column: assignee only.
 function renderFilterBar() {
   const f = state.filter;
   const assignees = state.tokens?.assignees || {};
-  const bar = el("div", { class: "filterbar" });
+  const extra = activeFilterCount();
+  const bar = el("div", { class: "filterbar", id: "filterbar" });
 
-  bar.append(el("div", { class: "fb-row" },
-    el("span", { class: "fb-h" }, "Assignee"),
-    ...Object.keys(assignees).map((a) =>
-      el("button", { class: "pill" + (f.assignee.has(a) ? " on" : ""), onclick: () => { f.assignee.has(a) ? f.assignee.delete(a) : f.assignee.add(a); render(); } },
-        assignees[a].emoji + " " + assignees[a].label))));
+  const row = el("div", { class: "fb-assignees" });
+  row.append(...Object.keys(assignees).map((a) =>
+    el("button", { class: "pill" + (f.assignee.has(a) ? " on" : ""), onclick: () => { f.assignee.has(a) ? f.assignee.delete(a) : f.assignee.add(a); refreshContent(); refreshFilterBar(); } },
+      assignees[a].emoji + " " + assignees[a].label)));
+  bar.append(row);
 
-  if (f.assignee.size || f.q)
-    bar.append(el("button", { class: "linkbtn", onclick: () => { f.assignee.clear(); f.q = ""; render(); } }, "✕ clear filters"));
+  const more = el("div", { class: "fb-more" });
+  const filterBtn = el("button", { class: "pill" + (state.filterPanelOpen ? " on" : ""), onclick: (ev) => { ev.stopPropagation(); toggleFilterPanel(); } },
+    "Filters", extra ? el("span", { class: "filter-count" }, String(extra)) : null);
+  more.append(filterBtn);
+  if (state.filterPanelOpen) {
+    more.append(el("div", { class: "filter-pop-backdrop", onclick: () => { state.filterPanelOpen = false; refreshFilterBar(); } }));
+    more.append(renderFilterPanel());
+  }
+  bar.append(more);
+
+  if (f.assignee.size || f.label.size || f.q || state.nav.phase || state.nav.release)
+    bar.append(el("button", { class: "linkbtn", onclick: clearAllFilters }, "✕ clear"));
   return bar;
+}
+
+function renderFilterPanel() {
+  const f = state.filter;
+  const pop = el("div", { class: "filter-pop", onclick: (ev) => ev.stopPropagation() });
+
+  const phases = state.roadmap?.phases || [];
+  if (phases.length) {
+    const sec = el("div", { class: "fp-sec" });
+    sec.append(el("span", { class: "fp-h" }, "Phase"));
+    const pills = el("div", { class: "fp-pills" });
+    phases.forEach((p) => pills.append(el("button", {
+      class: "pill ghost" + (state.nav.phase === p.id ? " on" : ""),
+      onclick: () => toggleNavPhase(p.id),
+    }, (p.emoji ? p.emoji + " " : "") + (p.title || p.id))));
+    sec.append(pills);
+    pop.append(sec);
+  }
+
+  const releases = state.roadmap?.releases || [];
+  if (releases.length) {
+    const sec = el("div", { class: "fp-sec" });
+    sec.append(el("span", { class: "fp-h" }, "Release"));
+    const pills = el("div", { class: "fp-pills" });
+    releases.forEach((r) => {
+      const color = releaseColor(r.id);
+      pills.append(el("button", {
+        class: "pill ghost" + (state.nav.release === r.id ? " on" : ""),
+        style: state.nav.release === r.id ? `background:${color};border-color:${color};color:#fff` : "",
+        onclick: () => toggleNavRelease(r.id),
+      }, (r.emoji ? r.emoji + " " : "") + (r.title || r.id)));
+    });
+    sec.append(pills);
+    pop.append(sec);
+  }
+
+  const lks = labelKeys();
+  if (lks.length) {
+    const sec = el("div", { class: "fp-sec" });
+    sec.append(el("span", { class: "fp-h" }, "Labels"));
+    const pills = el("div", { class: "fp-pills" });
+    lks.forEach((l) => pills.append(el("button", {
+      class: "pill ghost" + (f.label.has(l) ? " on" : ""),
+      onclick: () => { f.label.has(l) ? f.label.delete(l) : f.label.add(l); refreshContent(); refreshFilterBar(); },
+    }, (labelEmoji(l) ? labelEmoji(l) + " " : "") + l)));
+    sec.append(pills);
+    pop.append(sec);
+  }
+
+  if (state.canWrite) pop.append(el("button", { class: "linkbtn", onclick: () => { state.filterPanelOpen = false; openLabelManager(); } }, "Manage labels…"));
+  return pop;
 }
 
 function renderLegend() {
@@ -881,43 +1101,6 @@ function renderTopbar() {
   items.push(el("button", { class: "btn", title: "Reload", onclick: reload }, "↻"));
   items.push(el("span", { class: "save-state", id: "save-state" }));
   return el("div", { class: "topbar" }, ...items);
-}
-
-/* ---------- phase stepper ---------- */
-function renderStepper() {
-  const wrap = el("div", { class: "stepper", id: "stepper" });
-  const phases = state.roadmap?.phases || [];
-  phases.forEach((p) => {
-    const prog = phaseProgress(p);
-    const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
-    wrap.append(el("div", { class: "step" + (p.status === "active" ? " active" : "") + (state.nav.phase === p.id ? " sel" : ""), onclick: () => toggleNavPhase(p.id) },
-      el("div", { class: "st-top" },
-        el("span", {}, p.emoji || "📦"), el("span", {}, p.title || p.id),
-        p.status === "active" ? el("span", { class: "st-you" }, "you") : null),
-      el("div", { class: "st-prog" }, el("i", { style: `width:${pct}%` })),
-      el("div", { class: "st-meta" }, `${prog.done}/${prog.total} epics · ${p.status}`),
-    ));
-  });
-  return wrap;
-}
-
-function renderReleaseRail() {
-  const releases = state.roadmap?.releases || [];
-  if (!releases.length) return el("div");
-  const wrap = el("div", { class: "release-rail", id: "release-rail" });
-  wrap.append(el("span", { class: "rr-h" }, "Release"));
-  releases.forEach((r) => {
-    const prog = releaseProgress(r.id);
-    const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
-    wrap.append(el("div", { class: "step" + (r.status === "active" ? " active" : "") + (state.nav.release === r.id ? " sel" : ""), onclick: () => toggleNavRelease(r.id) },
-      el("div", { class: "st-top" },
-        el("span", {}, r.emoji || "🚀"), el("span", {}, r.title || r.id),
-        r.status === "active" ? el("span", { class: "st-you" }, "you") : null),
-      el("div", { class: "st-prog" }, el("i", { style: `width:${pct}%` })),
-      el("div", { class: "st-meta" }, `${prog.done}/${prog.total} epics · ${r.status}`),
-    ));
-  });
-  return wrap;
 }
 
 /* ---------- content: board | timeline ---------- */
@@ -950,11 +1133,17 @@ function renderCard(x) {
   const tasks = e.tasks || [];
   const done = tasks.filter((t) => t.status === "done").length;
   const am = assigneeMeta(e.assignee);
-  const rd = relDate(e.planned);
+  const rd = relDate(e.planned, e.status);
   const relId = resolveRelease(x);
   const rel = relId ? releaseMeta(relId) : null;
+  const relCol = relId ? releaseColor(relId) : null;
+  const phase = x.phase;
+  let cardCls = "card" + (x.archived ? " arch" : "");
+  if (e.status === "blocked") cardCls += " blocked-edge";
+  else if (relCol) cardCls += " rel-edge";
   const card = el("div", {
-    class: "card" + (x.archived ? " arch" : "") + (e.status === "blocked" ? " blocked-edge" : ""),
+    class: cardCls,
+    style: relCol ? `--rel-color:${relCol}` : "",
     draggable: x.archived ? "false" : "true",
     ondragstart: (ev) => { ev.dataTransfer.setData("text/id", e.id); card.classList.add("dragging"); },
     ondragend: () => card.classList.remove("dragging"),
@@ -968,7 +1157,8 @@ function renderCard(x) {
     el("div", { class: "ctitle" }, e.title),
     el("div", { class: "chips" },
       chip(am.emoji + " " + am.label, "assignee"),
-      rel ? chip((rel.emoji ? rel.emoji + " " : "") + rel.title, "release") : null,
+      phase ? chip((phase.emoji ? phase.emoji + " " : "") + (phase.title || phase.id), "phase") : null,
+      rel ? chip((rel.emoji ? rel.emoji + " " : "") + rel.title, "release", relCol) : null,
       ...(e.labels || []).map((l) => chip((labelEmoji(l) ? labelEmoji(l) + " " : "") + l)),
       rd ? chip("📅 " + rd.txt, "date " + rd.cls) : null,
     ),
@@ -982,36 +1172,128 @@ function renderCard(x) {
 
 function renderTimeline() {
   const wrap = el("div", { class: "timeline", id: "content" });
-  const upId = resolveNext(state.next?.next)?.epic?.id;
-  const phases = (state.roadmap?.phases || []).filter((p) => !state.nav.phase || p.id === state.nav.phase);
-  if (!phases.length) { wrap.append(el("div", { class: "muted", style: "padding:24px" }, "No phases match navigation.")); return wrap; }
-  phases.forEach((p) => {
-    const eps = (p.epics || []).filter((e) => epicVisible({ epic: e, phase: p, archived: false })).slice().sort((a, b) => compareEpicId(a.id, b.id));
-    const prog = phaseProgress(p);
-    const lane = el("div", { class: "lane" + (p.status === "active" ? " active" : ""), id: "lane-" + p.id });
-    lane.append(el("div", { class: "lane-head" },
-      el("span", {}, p.emoji || "📦"),
-      el("span", { class: "lh-title" }, p.title || p.id),
-      p.status === "active" ? el("span", { class: "lh-you" }, "● you are here") : null,
-      el("span", { class: "lh-prog" }, `${prog.done}/${prog.total} epics done`),
-    ));
-    const row = el("div", { class: "lane-epics" });
-    if (!eps.length) row.append(el("div", { class: "muted" }, "No epics"));
-    eps.forEach((e) => row.append(renderTimelineBar(e, e.id === upId)));
-    lane.append(row);
-    wrap.append(lane);
-  });
+  const tr = timelineRange();
+  const canvas = el("div", { class: "tl-wrap" });
+
+  const axis = el("div", { class: "tl-axis" });
+  tr.months.forEach((m) => axis.append(el("span", { class: "tl-tick", style: `left:${m.pct}%` }, m.label)));
+  axis.append(el("div", { class: "tl-today", style: `left:${tr.todayPct}%` }));
+  axis.append(el("span", { class: "tl-today-lbl", style: `left:${tr.todayPct}%` }, "today"));
+  canvas.append(axis);
+
+  const releases = state.roadmap?.releases || [];
+  if (releases.length) {
+    const track = el("div", { class: "tl-track" });
+    track.append(el("div", { class: "tl-track-h" }, "Releases"));
+    const lane = el("div", { class: "tl-lane" });
+    releases.forEach((r, i) => {
+      const eps = allEpics().filter((x) => !x.archived && resolveRelease(x) === r.id);
+      const dates = eps.map((x) => x.epic.planned).filter(Boolean).map((d) => new Date(d + "T00:00:00"));
+      let left, width;
+      if (dates.length) {
+        left = tr.pos(new Date(Math.min(...dates)));
+        const right = tr.pos(new Date(Math.max(...dates)));
+        width = Math.max(10, right - left + 4);
+      } else {
+        left = 6 + (i * 14) % 60;
+        width = 12;
+      }
+      const color = releaseColor(r.id);
+      const sel = state.nav.release === r.id;
+      lane.append(el("button", {
+        class: "tl-node release" + (sel ? " sel" : ""),
+        style: `left:${left}%;width:${width}%;background:${color}`,
+        onclick: () => toggleNavRelease(r.id),
+      }, (r.emoji || "🚀") + " " + (r.title || r.id)));
+    });
+    track.append(lane);
+    canvas.append(track);
+  }
+
+  const phases = state.roadmap?.phases || [];
+  if (phases.length) {
+    const track = el("div", { class: "tl-track" });
+    track.append(el("div", { class: "tl-track-h" }, "Phases"));
+    const lane = el("div", { class: "tl-lane" });
+    const step = 100 / (phases.length + 1);
+    phases.forEach((p, i) => {
+      const sel = state.nav.phase === p.id;
+      lane.append(el("button", {
+        class: "tl-node phase" + (sel ? " sel" : ""),
+        style: `left:${step * (i + 1)}%;transform:translateX(-50%)`,
+        onclick: () => toggleNavPhase(p.id),
+      }, (p.emoji || "📦") + " " + (p.title || p.id)));
+    });
+    track.append(lane);
+    canvas.append(track);
+  }
+
+  wrap.append(canvas);
+  wrap.append(renderTimelineSpawn());
   return wrap;
 }
-function renderTimelineBar(e, isUp) {
+
+function renderTimelineSpawn() {
+  const spawn = el("div", { class: "tl-spawn" });
+  if (!state.nav.phase && !state.nav.release) {
+    spawn.append(el("div", { class: "muted", style: "padding:14px 4px" }, "Click a phase or release on the timeline, or use the sidebar, to spawn epics below."));
+    return spawn;
+  }
+
+  let title = "Epics";
+  let eps = allEpics().filter((x) => epicVisible(x) && !x.archived);
+  if (state.nav.release) {
+    const r = releaseMeta(state.nav.release);
+    title = (r.emoji ? r.emoji + " " : "") + r.title;
+    eps = eps.filter((x) => resolveRelease(x) === state.nav.release);
+  } else if (state.nav.phase) {
+    const p = (state.roadmap?.phases || []).find((ph) => ph.id === state.nav.phase);
+    title = (p?.emoji ? p.emoji + " " : "") + (p?.title || state.nav.phase);
+    eps = eps.filter((x) => x.phase.id === state.nav.phase);
+  }
+
+  spawn.append(el("div", { class: "tl-spawn-h" },
+    el("h3", {}, title),
+    el("span", { class: "muted" }, eps.length + " epic" + (eps.length === 1 ? "" : "s"))));
+  const grid = el("div", { class: "tl-spawn-grid" });
+  const upId = resolveNext(state.next?.next)?.epic?.id;
+  eps.sort((a, b) => {
+    const da = a.epic.planned ? new Date(a.epic.planned + "T00:00:00") : null;
+    const db = b.epic.planned ? new Date(b.epic.planned + "T00:00:00") : null;
+    if (da && db) return da - db;
+    if (da) return -1;
+    if (db) return 1;
+    return compareEpicId(a.epic.id, b.epic.id);
+  });
+  if (!eps.length) grid.append(el("div", { class: "muted" }, "No epics match."));
+  eps.forEach((x) => grid.append(renderTimelineBar(x, x.epic.id === upId)));
+  spawn.append(grid);
+  return spawn;
+}
+
+function renderTimelineBar(x, isUp) {
+  const e = x.epic;
   const tasks = e.tasks || [];
   const done = tasks.filter((t) => t.status === "done").length;
   const am = assigneeMeta(e.assignee);
   const sm = statusMeta(e.status);
-  const bar = el("div", { class: "tbar" + (isUp ? " up" : ""), style: `--st-color:${STATUS_COLOR[e.status] || "var(--border)"}`, onclick: () => openDrawer(e.id) },
+  const relId = resolveRelease(x);
+  const relCol = relId ? releaseColor(relId) : null;
+  const phase = x.phase;
+  const rd = relDate(e.planned, e.status);
+  const bar = el("div", {
+    class: "tbar" + (isUp ? " up" : ""),
+    style: `--rel-color:${relCol || STATUS_COLOR[e.status] || "var(--border)"};--st-color:${STATUS_COLOR[e.status] || "var(--border)"}`,
+    onclick: () => openDrawer(e.id),
+  },
     el("div", { class: "tb-top" }, el("span", { class: "emoji" }, e.emoji || "🧩"), el("span", { class: "eid" }, e.id)),
     el("div", { class: "tb-title" }, e.title),
-    el("div", { class: "tb-meta" }, chip(am.emoji + " " + am.label, "assignee"), el("span", {}, sm.emoji + " " + sm.label)),
+    el("div", { class: "tb-meta" },
+      chip(am.emoji + " " + am.label, "assignee"),
+      phase ? chip((phase.emoji ? phase.emoji + " " : "") + (phase.title || phase.id), "phase") : null,
+      relId ? chip(releaseMeta(relId).title, "release", relCol) : null,
+      el("span", {}, sm.emoji + " " + sm.label),
+      rd ? chip("📅 " + rd.txt, "date " + rd.cls) : null),
   );
   if (tasks.length) {
     bar.append(el("div", { class: "progress" }, el("i", { style: `width:${Math.round(done / tasks.length * 100)}%` })));
