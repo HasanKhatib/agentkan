@@ -24,6 +24,11 @@ docs/board/
 Pick a different directory with `npx agentkan init path/to/dir`. Re-running
 `init` never overwrites existing files unless you pass `--force`.
 
+After upgrading the `agentkan` package, run `npx agentkan upgrade` to refresh
+`index.html`, `favicon.svg`, and `roadmap.schema.json` to the installed
+version. It only touches those static files, never `roadmap.json` /
+`archive.json` / `next.json` / `board.tokens.json` / `epics/`.
+
 ## 2. Open the board
 
 ```bash

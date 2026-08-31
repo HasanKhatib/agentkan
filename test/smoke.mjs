@@ -71,6 +71,20 @@ try {
   // 6. example board validates
   r = run(["validate", "examples/sample-board"], ROOT);
   ok(r.status === 0, "bundled example board validates");
+
+  // 7. upgrade refreshes static assets, leaves data files alone
+  await writeFile(path.join(board, "index.html"), "<!-- stale -->");
+  const roadmapBefore = await readFile(path.join(board, "roadmap.json"), "utf8");
+  r = run(["upgrade"], tmp);
+  ok(r.status === 0, "upgrade exits 0");
+  const upgradedHtml = await readFile(path.join(board, "index.html"), "utf8");
+  ok(!upgradedHtml.includes("stale"), "upgrade overwrote index.html");
+  const roadmapAfter = await readFile(path.join(board, "roadmap.json"), "utf8");
+  ok(roadmapAfter === roadmapBefore, "upgrade left roadmap.json untouched");
+
+  // 7b. upgrade refuses a dir with no board
+  r = run(["upgrade", "not-a-board"], tmp);
+  ok(r.status === 1, "upgrade fails outside a board dir");
 } finally {
   await rm(tmp, { recursive: true, force: true });
 }

@@ -3,6 +3,7 @@ import { validateBoard } from "../lib/validate.mjs";
 import { init } from "../lib/init.mjs";
 import { epicNew } from "../lib/epicNew.mjs";
 import { serve } from "../lib/serve.mjs";
+import { upgrade } from "../lib/upgrade.mjs";
 import { c } from "../lib/util.mjs";
 
 // Minimal arg parser: positionals + --flag value / --flag=value / --bool.
@@ -27,6 +28,7 @@ ${c.bold("Usage")}
   agentkan init [dir]            Scaffold a board (default docs/board)
   agentkan epic new "<title>"    Add an epic stub + markdown body
   agentkan serve [dir]           Serve the board on localhost (read-write)
+  agentkan upgrade [dir]         Refresh the viewer to match the installed version
   agentkan validate [dir]        Validate roadmap.json / archive.json
   agentkan help
 
@@ -59,6 +61,9 @@ try {
       break;
     case "serve":
       await serve({ dir: sub || "docs/board", port: opts.port ? Number(opts.port) : 4173, open: opts.open !== false && !opts["no-open"] });
+      break;
+    case "upgrade":
+      await upgrade({ dir: sub || "docs/board" });
       break;
     case "validate": {
       const dir = sub || "docs/board";
