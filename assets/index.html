@@ -183,8 +183,7 @@
     transition: border-color .12s, background .12s, box-shadow .12s;
   }
   .side-item:hover { border-color: #d4d7dd; }
-  .side-item.active-phase { border-color: var(--text-primary); }
-  .side-item.sel { box-shadow: inset 3px 0 0 var(--item-color, var(--text-primary)); background: color-mix(in srgb, var(--item-color, var(--brand-subtle)) 14%, var(--bg-canvas)); border-color: color-mix(in srgb, var(--item-color, var(--border)) 40%, var(--border)); font-weight: 600; }
+  .side-item.sel { box-shadow: inset 3px 0 0 var(--item-color, var(--accent)); background: color-mix(in srgb, var(--item-color, var(--accent)) 14%, var(--bg-canvas)); border-color: color-mix(in srgb, var(--item-color, var(--accent)) 40%, var(--border)); font-weight: 600; }
   .side-item .si-meta { margin-left: auto; font-size: 10px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
   .side-item .si-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; background: var(--item-color, var(--text-secondary)); }
   .side-item .si-you { font-size: 9px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
@@ -269,10 +268,10 @@
     border: 1px solid transparent; transition: transform .12s, box-shadow .12s;
   }
   .tl-node:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
-  .tl-node.sel { outline: 2px solid var(--text-primary); outline-offset: 1px; z-index: 3; }
+  .tl-node.sel { outline: 2px solid var(--item-color, var(--accent)); outline-offset: 1px; z-index: 3; }
   .tl-node.release { color: #fff; }
   .tl-node.phase { background: var(--bg-surface); border-color: var(--border); color: var(--text-primary); }
-  .tl-node.phase.sel { outline-color: var(--text-primary); background: var(--brand-subtle); }
+  .tl-node.phase.sel { outline-color: var(--accent); background: var(--brand-subtle); }
   .tl-spawn { margin-top: 4px; }
   .tl-spawn-h { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
   .tl-spawn-h h3 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: -.02em; }
