@@ -114,8 +114,9 @@ The viewer is fully data-driven from this file: map `theme` to your project's
 design tokens and define the emoji for each assignee and status. No code change
 is needed to re-skin a board. **Labels are free-form** — any string is valid and
 `validate` never rejects one. The `labels` map here only assigns an emoji to the
-common ones; unknown labels render without an emoji. Labels are not in the filter
-bar; they appear on epic cards and in the drawer.
+common ones; unknown labels render without an emoji. Labels are filterable from
+the viewer's **Filters** popover (multi-select, combines with the assignee
+filter) — see docs/viewer.md.
 
 ## Display order
 

@@ -21,7 +21,7 @@ Your agent shapes work, the CLI stubs epics, and the board is where you operate 
 
 - [Getting started](docs/getting-started.md) — Install, scaffold `docs/board/`, open the viewer, and wire `validate` into your workflow.
 - [How it works](docs/how-it-works.md) — Day-to-day usage: three surfaces (agent, CLI, board), scenarios, and what is configurable.
-- [Data model](docs/data-model.md) — Field reference for `roadmap.json`, epics, tasks, `next.json`, and `board.tokens.json`. Use when editing JSON or reviewing agent changes.
+- [Data model](skills/agentkan/references/data-model.md) — Field reference for `roadmap.json`, epics, tasks, `next.json`, and `board.tokens.json`. Use when editing JSON or reviewing agent changes.
 - [Viewer](docs/viewer.md) — What the board UI does: drag-and-drop, in-board epic body editing, archiving, re-skinning via tokens, read-write when served.
 - [Skill & AI workflow](docs/skill.md) — How to install the Agent Skill so Claude follows board conventions (propose vs dispose, interview, handoff).
 - [Distribution & publishing](docs/distribution.md) — GitHub setup, npm publish, local `npm pack` testing, CI.

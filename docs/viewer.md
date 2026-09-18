@@ -19,21 +19,21 @@ already owns the board directory you launched it from.
 
 ## Layout
 
-- **Sidebar** (left): switch between **Board** and **Timeline**, see and edit
-  **Up next**, and toggle Archived / Legend. Hide or show it with the ☰ button in
-  the top bar (the collapsed state is remembered); on narrow screens ☰ opens it
-  as a slide-over.
-- **Top bar**: ☰ (sidebar), the current view, search (Board view), the
-  light/dark toggle (☀/🌙), reload, and the save chip.
-- **Phase stepper** (both views): one chip per phase with a progress bar; the
-  phase whose `status` is `active` is marked **you**. Click a phase to focus the
-  board on that phase (click again to clear). Single-select only.
-- **Release rail** (when `roadmap.json` has `releases[]`): same pattern as phases,
-  below the stepper. Click to focus on one release; click again to clear.
-- **Filter bar** (under the rails): **Assignee** row only; "clear filters" resets
-  assignee and search. Phases, releases, and labels are structure and context,
-  not filter chips. Manage label vocabulary from the sidebar **Labels** button
-  (write mode) or via `board.tokens.json`.
+- **Top bar**: ☰ (toggle sidebar), the current view/brand, search (Board view),
+  the light/dark toggle (☀/🌙), reload, and the save chip.
+- **Sidebar** (left, toggled by ☰; collapsed state remembered; becomes a
+  slide-over on narrow screens): switch **Board** / **Timeline**, **Up next**
+  (with an **Edit** button in write mode), a **Phases** list (each shows
+  progress as done/total, tags the active phase "now"; click to focus the
+  board on just that phase, click again to clear), a **Releases** list (same
+  pattern, shown when `roadmap.json` has `releases[]`), then **Archived**,
+  **Legend**, and (write mode) **Labels** toggle buttons.
+- **Filter bar** (under the top bar): an **Assignee** pill row (click to
+  toggle, combines as OR within assignee) plus a **Filters** button that opens
+  a popover with **Phase**, **Release**, and **Labels** pill sections — same
+  phase/release focus as the sidebar, plus label filtering (an epic must carry
+  at least one selected label to match). All active filters — assignee, label,
+  search, phase focus, release focus — clear together via **✕ clear**.
 
 ## The two views
 
@@ -57,10 +57,10 @@ already owns the board directory you launched it from.
   `next.json`.
 - **Archive** a Done epic from its drawer — it moves to `archive.json` with a
   `shipped` date and leaves the live board. **Restore** brings it back.
-- **Filter** by assignee (filter bar), focus by phase or release (stepper/rail),
-  or **search** by id/title. **Archived** toggles finished epics into view.
-  **Legend** shows the full emoji vocabulary. **Labels** (write mode) opens the
-  label manager.
+- **Filter** by assignee or label (filter bar + Filters popover), focus by
+  phase or release (sidebar or Filters popover), or **search** by id/title.
+  **Archived** toggles finished epics into view. **Legend** shows the full
+  emoji vocabulary. **Labels** (write mode) opens the label manager.
 - **Switch light/dark** with the ☀/🌙 toggle. It defaults to your OS appearance
   and remembers your choice; text stays high-contrast in both.
 

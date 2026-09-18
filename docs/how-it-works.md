@@ -184,4 +184,4 @@ npx agentkan validate [dir]          # schema gate
 
 Full `epic new` flags: [getting started](getting-started.md).
 
-Field shapes: [data model](data-model.md).
+Field shapes: [data model](../skills/agentkan/references/data-model.md).
