@@ -183,10 +183,20 @@
     transition: border-color .12s, background .12s, box-shadow .12s;
   }
   .side-item:hover { border-color: #d4d7dd; }
+  .side-item.done-phase { opacity: .55; }
+  .side-item.done-phase:hover { opacity: .8; }
   .side-item.sel { box-shadow: inset 3px 0 0 var(--item-color, var(--accent)); background: color-mix(in srgb, var(--item-color, var(--accent)) 14%, var(--bg-canvas)); border-color: color-mix(in srgb, var(--item-color, var(--accent)) 40%, var(--border)); font-weight: 600; }
   .side-item .si-meta { margin-left: auto; font-size: 10px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
   .side-item .si-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; background: var(--item-color, var(--text-secondary)); }
   .side-item .si-you { font-size: 9px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
+  .side-item-row { display: flex; align-items: stretch; gap: 4px; }
+  .side-item-row .side-item { flex: 1; min-width: 0; }
+  .si-info {
+    flex: 0 0 auto; width: 30px; border: 1px solid var(--border); border-radius: var(--r-md);
+    background: var(--bg-canvas); color: var(--text-secondary); font-size: 12px; cursor: pointer;
+    transition: border-color .12s, color .12s;
+  }
+  .si-info:hover { border-color: #d4d7dd; color: var(--text-primary); }
 
   /* ---------- Filter bar (compact) ---------- */
   .filterbar {
@@ -393,6 +403,7 @@
    ============================================================ */
 
 const STATUS_ORDER = ["backlog", "next", "active", "blocked", "done"];
+const PHASE_STATUS_ORDER = ["planned", "active", "done"];
 const TASK_CYCLE = { todo: "doing", doing: "done", done: "todo" };
 const STATUS_COLOR = {
   backlog: "var(--text-secondary)", next: "var(--accent)", active: "var(--brand)",
@@ -423,12 +434,14 @@ const state = {
   themeMode: initialTheme(),     // "light" | "dark"
   greeting: GREETINGS[Math.floor(Math.random() * GREETINGS.length)],  // chosen once per load
   showArchived: false,
+  showDonePhases: false,
   nav: { phase: null, release: null },
   filter: { assignee: new Set(), label: new Set(), q: "" },
   filterPanelOpen: false,
   openEpicId: null,
   nextEditorOpen: false,
   labelManagerOpen: false,
+  phaseDetailId: null,
   legendOpen: false,
   sidebarOpen: false,            // mobile slide-over
   sidebarCollapsed: localStorage.getItem(SIDEBAR_KEY) === "1",  // desktop
@@ -525,6 +538,7 @@ function allEpics() {
   return out;
 }
 function findEpic(id) { return allEpics().find((x) => x.epic.id === id) || null; }
+function findPhase(id) { return (state.roadmap?.phases || []).find((p) => p.id === id) || null; }
 
 // Sort E<phase>.<n> ids numerically (E1.2 before E1.10).
 function compareEpicId(a, b) {
@@ -692,16 +706,31 @@ async function doSaveNext() {
 }
 
 /* ---------- mutations: epics ---------- */
+// If every epic left in a phase is done and the phase itself isn't marked
+// done yet, offer to close the phase too. Skips phases with zero epics
+// (nothing to conclude from, e.g. a phase just emptied out by deletion).
+function maybeOfferPhaseComplete(phaseId) {
+  const p = (state.roadmap?.phases || []).find((ph) => ph.id === phaseId);
+  if (!p || p.status === "done" || !(p.epics || []).length) return;
+  if (p.epics.every((e) => e.status === "done")) {
+    if (confirm(`All epics in "${p.title || p.id}" are done — mark the phase done too?`)) {
+      p.status = "done";
+      scheduleSave(); render();
+    }
+  }
+}
 function moveEpic(id, newStatus) {
   const x = findEpic(id);
   if (!x || x.archived) return;
   x.epic.status = newStatus;
   scheduleSave(); render();
+  if (newStatus === "done") maybeOfferPhaseComplete(x.phase.id);
 }
 function editEpic(id, patch) {
   const x = findEpic(id); if (!x) return;
   Object.assign(x.epic, patch);
   scheduleSave(); render();
+  if (patch.status === "done" && !x.archived) maybeOfferPhaseComplete(x.phase.id);
 }
 function archiveEpic(id) {
   const idx = state.roadmap.phases.findIndex((p) => (p.epics || []).some((e) => e.id === id));
@@ -717,6 +746,7 @@ function archiveEpic(id) {
   state.archive.epics.unshift(epic);
   state.openEpicId = null;
   scheduleSave(); render();
+  maybeOfferPhaseComplete(p.id);
 }
 function restoreEpic(id) {
   const i = (state.archive.epics || []).findIndex((e) => e.id === id);
@@ -817,7 +847,7 @@ function setTheme(mode) {
   render();
 }
 // ---- label vocabulary management (board.tokens.json) ----
-function openLabelManager() { state.labelManagerOpen = true; state.openEpicId = null; state.nextEditorOpen = false; render(); }
+function openLabelManager() { state.labelManagerOpen = true; state.openEpicId = null; state.nextEditorOpen = false; state.phaseDetailId = null; render(); }
 function allEpicArrays() {
   const eps = [];
   for (const p of state.roadmap?.phases || []) for (const e of p.epics || []) eps.push(e);
@@ -937,25 +967,42 @@ function renderSidebar() {
   return el("div", { class: "sidebar", id: "sidebar" }, inner);
 }
 
+function renderPhaseItem(p) {
+  const prog = phaseProgress(p);
+  const sel = state.nav.phase === p.id;
+  const done = p.status === "done";
+  const btn = el("button", {
+    class: "side-item" + (p.status === "active" ? " active-phase" : "") + (done ? " done-phase" : "") + (sel ? " sel" : ""),
+    style: sel ? "--item-color: var(--text-primary)" : "",
+    onclick: () => toggleNavPhase(p.id),
+  },
+    el("span", {}, p.emoji || "📦"),
+    el("span", {}, p.title || p.id),
+    p.status === "active" ? el("span", { class: "si-you" }, "now") : null,
+    el("span", { class: "si-meta" }, `${prog.done}/${prog.total}`));
+  const info = el("button", {
+    class: "si-info", title: "Phase details",
+    onclick: (ev) => { ev.stopPropagation(); openPhaseDetail(p.id); },
+  }, "ⓘ");
+  return el("div", { class: "side-item-row" }, btn, info);
+}
+
 function renderSidePhases() {
   const phases = state.roadmap?.phases || [];
   if (!phases.length) return el("div");
+  const live = phases.filter((p) => p.status !== "done");
+  const done = phases.filter((p) => p.status === "done");
   const sec = el("div", { class: "side-sec" });
   sec.append(el("span", { class: "side-h" }, "Phases"));
   const nav = el("div", { class: "side-nav" });
-  phases.forEach((p) => {
-    const prog = phaseProgress(p);
-    const sel = state.nav.phase === p.id;
+  live.forEach((p) => nav.append(renderPhaseItem(p)));
+  if (done.length) {
     nav.append(el("button", {
-      class: "side-item" + (p.status === "active" ? " active-phase" : "") + (sel ? " sel" : ""),
-      style: sel ? "--item-color: var(--text-primary)" : "",
-      onclick: () => toggleNavPhase(p.id),
-    },
-      el("span", {}, p.emoji || "📦"),
-      el("span", {}, p.title || p.id),
-      p.status === "active" ? el("span", { class: "si-you" }, "now") : null,
-      el("span", { class: "si-meta" }, `${prog.done}/${prog.total}`)));
-  });
+      class: "linkbtn",
+      onclick: () => { const s = sidebarScrollTop(); state.showDonePhases = !state.showDonePhases; refreshSidebar(); restoreSidebarScroll(s); },
+    }, (state.showDonePhases ? "▾ " : "▸ ") + `${done.length} done`));
+    if (state.showDonePhases) done.forEach((p) => nav.append(renderPhaseItem(p)));
+  }
   sec.append(nav);
   return sec;
 }
@@ -1303,28 +1350,34 @@ function renderTimelineBar(x, isUp) {
 
 /* ---------- drawer ---------- */
 function renderDrawerEl() {
-  const open = !!state.openEpicId || state.nextEditorOpen || state.labelManagerOpen;
+  const open = !!state.openEpicId || state.nextEditorOpen || state.labelManagerOpen || !!state.phaseDetailId;
   const scrim = el("div", { class: "scrim" + (open ? " open" : ""), onclick: closeDrawer });
   const drawer = el("div", { class: "drawer" + (open ? " open" : ""), id: "drawer" });
   if (state.openEpicId) drawer.append(...drawerContent(findEpic(state.openEpicId)));
   else if (state.nextEditorOpen) drawer.append(...nextEditorContent());
   else if (state.labelManagerOpen) drawer.append(...labelManagerContent());
+  else if (state.phaseDetailId) drawer.append(...phaseDetailContent(findPhase(state.phaseDetailId)));
   return el("div", {}, scrim, drawer);
 }
 function openDrawer(id) {
-  state.openEpicId = id; state.nextEditorOpen = false;
+  state.openEpicId = id; state.nextEditorOpen = false; state.phaseDetailId = null;
   state.body = { id, text: null, loading: true, editing: false };
   render();
   loadBody(id);
 }
-function openNextEditor() { state.nextEditorOpen = true; state.openEpicId = null; render(); }
-function closeDrawer() { state.openEpicId = null; state.nextEditorOpen = false; state.labelManagerOpen = false; state.body = null; render(); }
+function openNextEditor() { state.nextEditorOpen = true; state.openEpicId = null; state.phaseDetailId = null; render(); }
+function openPhaseDetail(id) {
+  state.phaseDetailId = id; state.openEpicId = null; state.nextEditorOpen = false; state.labelManagerOpen = false;
+  render();
+}
+function closeDrawer() { state.openEpicId = null; state.nextEditorOpen = false; state.labelManagerOpen = false; state.phaseDetailId = null; state.body = null; render(); }
 function renderDrawer() {
   const d = $("#drawer"); if (!d) return;
   d.innerHTML = "";
   if (state.openEpicId) { const x = findEpic(state.openEpicId); if (x) d.append(...drawerContent(x)); }
   else if (state.nextEditorOpen) d.append(...nextEditorContent());
   else if (state.labelManagerOpen) d.append(...labelManagerContent());
+  else if (state.phaseDetailId) d.append(...phaseDetailContent(findPhase(state.phaseDetailId)));
 }
 
 async function loadBody(id) {
@@ -1468,6 +1521,54 @@ function drawerContent(x) {
   if (x.archived && state.canWrite) actions.append(el("button", { class: "btn", onclick: () => restoreEpic(e.id) }, "↩︎ Restore to board"));
   if (ro && !x.archived) actions.append(el("span", { class: "muted" }, "Read-only — run `agentkan serve` to edit."));
   body.append(actions);
+
+  return [head, body];
+}
+
+/* ---------- phase details (drawer) ---------- */
+function phaseDetailContent(p) {
+  if (!p) return [];
+  const ro = !state.canWrite;
+  const prog = phaseProgress(p);
+
+  const head = el("div", { class: "dr-head" },
+    el("button", { class: "x", onclick: closeDrawer }, "×"),
+    el("div", { class: "eid" }, p.id),
+    el("h2", {}, (p.emoji ? p.emoji + " " : "") + (p.title || p.id)));
+
+  const body = el("div", { class: "dr-body" });
+
+  const statusSel = el("select", {
+    disabled: ro,
+    onchange: (ev) => { p.status = ev.target.value; scheduleSave(); refreshSidebar(); renderDrawer(); },
+  }, ...PHASE_STATUS_ORDER.map((s) =>
+    el("option", { value: s, selected: s === p.status ? true : null }, statusMeta(s).emoji + " " + statusMeta(s).label)));
+
+  body.append(
+    el("div", { class: "field" }, el("label", {}, "Status"), statusSel),
+    el("div", { class: "ge" }, el("div", { class: "k" }, "📊 Progress"), el("div", { class: "v" }, `${prog.done}/${prog.total} epics done`)),
+    el("div", { class: "ge" }, el("div", { class: "k" }, "🎯 Goal"), el("div", { class: "v" }, p.goal || "—")),
+    el("div", { class: "ge" }, el("div", { class: "k" }, "✅ Exit"), el("div", { class: "v" }, p.exit || "—")),
+  );
+
+  const epicsWrap = el("div", { class: "field" });
+  epicsWrap.append(el("div", { class: "body-head" }, el("label", { class: "grow" }, "Epics")));
+  const list = el("div", { class: "tasks" });
+  (p.epics || []).forEach((e) => {
+    list.append(el("div", {
+      class: "task" + (e.status === "done" ? " done" : ""),
+      style: "cursor: pointer",
+      onclick: () => openDrawer(e.id),
+    },
+      el("span", { class: "st" }, statusMeta(e.status).emoji || "•"),
+      el("span", { class: "tk" }, e.id),
+      el("span", { class: "tt" }, e.title)));
+  });
+  if (!(p.epics || []).length) list.append(el("div", { class: "muted" }, "No epics in this phase."));
+  epicsWrap.append(list);
+  body.append(epicsWrap);
+
+  if (ro) body.append(el("span", { class: "muted" }, "Read-only — run `agentkan serve` to edit."));
 
   return [head, body];
 }
